@@ -1,0 +1,6 @@
+package services
+
+type IService interface {
+	Run() error
+	Close() error
+}
