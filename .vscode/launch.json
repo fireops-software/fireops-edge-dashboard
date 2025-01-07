@@ -28,16 +28,16 @@
             "mode": "auto",
             "program": "${workspaceFolder}/main.go",
             "env": {
-                "RABBITMQ_HOST": "192.168.178.52",
+                "RABBITMQ_HOST": "172.20.10.5",
                 "RABBITMQ_PORT": "5672",
                 "RABBITMQ_USER": "guest",
                 "RABBITMQ_PW": "guest",
-                "RABBITMQ_EXCHANGE": "",
-                "FIREOPS_BASE_URL": "",
-                "FIREOPS_TOKEN": "",
-                "FIREDEP_NAME": "",
-                "FIREDEP_ADDR": "",
-                "FIREDEP_LOGO_URL": "",
+                "RABBITMQ_EXCHANGE": "ActiveAlerts",
+                "FIREOPS_BASE_URL": "https://einsatz.bfk-perg.at",
+                "FIREOPS_TOKEN": "pZzrbnOsfmG4ZPoB2J7GOvZefpGcIAYoZ07AqUgHe97ca551",
+                "FIREDEP_NAME": "Freiwillige Feuerwehr Klam",
+                "FIREDEP_ADDR": "Klam 59, 4352 Klam",
+                "FIREDEP_LOGO_URL": "https://sybos.ooelfv.at/sybServices/getImage.php?typ=abteilung&id=1000",
                 "API_PORT": "8080"
             },
         }

@@ -10,8 +10,8 @@ export class Operation {
     public sub_eng?: string,    // z.B.: Brand Container im Freien
     public alarm_lev?: number,  // Alarmstufe
     public event_alarmtext?: string,  // Freitext Infofeld
-    public create_time?: Date,    // timestamp created from lfk
-    public firstdispatch_time?: Date, // timestamp created from lfk
+    public create_time?: string,    // timestamp created from lfk
+    public firstdispatch_time?: string, // timestamp created from lfk
     public latitude?: number,       // lat einsatzziel
     public longitude?: number,      // lon einsatzziel
     public caller_name?: string,    // Anfufer

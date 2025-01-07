@@ -4,24 +4,27 @@ import OperationList from "./OperationList";
 import MainOperation from "./MainOperation";
 import { FireDepInfo } from "../domain/FireDepInfo";
 import { getSmallerTimeStamp } from "../utils/TimeUtil";
+import AppConfig from "../AppConfig";
 
 const View = ({fireDepInfo}: {fireDepInfo: FireDepInfo}) => {
   const [operations, setOperations] = useState<Operation[]>([])
   
   useEffect(()=>{
-    const es: EventSource = new EventSource("/api/v1/operations/notification");
+    const es: EventSource = new EventSource(`${AppConfig.backendBaseUrl}/api/v1/operations/notification`);
     es.onerror = (e) => console.error(e);
-    es.onmessage = (e) => setOperations(JSON.parse(e.data))
+    es.onmessage = (e) => {
+      let o: Operation[] = JSON.parse(e.data);
+      o.sort((a: Operation, b: Operation) => {
+        const tsA: Date | undefined = getSmallerTimeStamp(a.firstdispatch_time, a.create_time);
+        const tsB: Date | undefined = getSmallerTimeStamp(b.firstdispatch_time, b.create_time);
+        if(tsA == tsB || !tsA || !tsB)
+            return 0;     
+        return tsB.getTime() - tsA.getTime();
+      });
+      setOperations(o);
+    }
     return () => es.close();
   }, []);
-  
-  operations.sort((a: Operation, b: Operation) => {
-    const tsA = getSmallerTimeStamp(a.firstdispatch_time, a.create_time);
-    const tsB = getSmallerTimeStamp(b.firstdispatch_time, b.create_time);
-    if(tsA == tsB || !tsA || !tsB)
-        return 0;     
-    return tsA.getTime() - tsB.getTime();
-  })
 
   let content;
   if(operations.length > 0) {
