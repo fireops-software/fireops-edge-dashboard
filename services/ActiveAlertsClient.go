@@ -6,6 +6,7 @@ import (
 
 	"github.com/uoul/fireops-edge-dashboard/domain"
 	"github.com/uoul/go-common/async"
+	"github.com/uoul/go-common/log"
 
 	amqp "github.com/rabbitmq/amqp091-go"
 	appError "github.com/uoul/fireops-edge-dashboard/error"
@@ -22,6 +23,7 @@ type ActiveAlertsClient struct {
 	password   string
 	exchange   string
 	buffersize uint
+	logger     log.ILogger
 	stop       chan any
 
 	clients map[async.Stream[[]domain.Operation]]bool
@@ -116,11 +118,11 @@ LP1:
 				break
 			}
 			// Convert incomming message to needed domain object
-			operations, err := convertWasMsgToOperations(&wasMsg)
+			operations := convertWasMsgToOperations(&wasMsg)
 			// Return current operations
 			a.notify(async.ActionResult[[]domain.Operation]{
 				Result: operations,
-				Error:  err,
+				Error:  nil,
 			})
 		}
 	}
@@ -130,7 +132,7 @@ LP1:
 // ----------------------------------------------------------------------
 // Private
 // ----------------------------------------------------------------------
-func convertWasMsgToOperations(wasMsg *domain.WasMsg) ([]domain.Operation, error) {
+func convertWasMsgToOperations(wasMsg *domain.WasMsg) []domain.Operation {
 	operations := []domain.Operation{}
 	for alertId, alert := range wasMsg.Alerts {
 		o := domain.Operation{
@@ -153,7 +155,7 @@ func convertWasMsgToOperations(wasMsg *domain.WasMsg) ([]domain.Operation, error
 		}
 		operations = append(operations, o)
 	}
-	return operations, nil
+	return operations
 }
 
 func (a *ActiveAlertsClient) notify(msg async.ActionResult[[]domain.Operation]) {
@@ -174,7 +176,7 @@ func WithActiveAlertsClientBufferSize(size uint) func(*ActiveAlertsClient) {
 // ----------------------------------------------------------------------
 // Constructor
 // ----------------------------------------------------------------------
-func NewActiveAlertsClient(host string, port uint16, user, password, exchange string) INotificationService[[]domain.Operation] {
+func NewActiveAlertsClient(host string, port uint16, user, password, exchange string, logger log.ILogger) INotificationService[[]domain.Operation] {
 	return &ActiveAlertsClient{
 		host:       host,
 		port:       port,
@@ -183,6 +185,7 @@ func NewActiveAlertsClient(host string, port uint16, user, password, exchange st
 		exchange:   exchange,
 		buffersize: 0,
 		stop:       make(chan any),
+		logger:     logger,
 		clients:    map[async.Stream[[]domain.Operation]]bool{},
 	}
 }

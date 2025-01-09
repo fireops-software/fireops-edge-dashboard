@@ -13,7 +13,9 @@ import (
 
 func main() {
 	cp := config.NewEnvVarProvider()
-	logger := log.NewConsoleLogger(log.INFO)
+	logger := log.NewConsoleLogger(
+		log.StringToLogLevel(cp.StringOrDefault("LOG_LEVEL", ""), log.INFO),
+	)
 
 	activeAlertsClient := services.NewActiveAlertsClient(
 		cp.StringOrDefault("RABBITMQ_HOST", "localhost"),
@@ -21,12 +23,14 @@ func main() {
 		cp.StringOrDefault("RABBITMQ_USER", ""),
 		cp.StringOrDefault("RABBITMQ_PW", ""),
 		cp.StringOrDefault("RABBITMQ_EXCHANGE", ""),
+		logger,
 	)
 	defer activeAlertsClient.Close()
 
 	fireOpsApi := fireops.NewFireOpsApi(
 		cp.StringOrDefault("FIREOPS_BASE_URL", ""),
 		cp.StringOrDefault("FIREOPS_TOKEN", ""),
+		logger,
 	)
 
 	activeAlertsCache := services.NewActiveAlertsCache(
@@ -51,7 +55,7 @@ func main() {
 
 	go activeAlertsClient.Run()
 	go activeAlertsCache.Run()
-	apiPort := cp.UInt16OrDefault("API_PORT", 8080)
+	apiPort := cp.UInt16OrDefault("API_PORT", 80)
 	logger.Infof("Listening on for incomming connections on port %d", apiPort)
 	api.Run(apiPort)
 }

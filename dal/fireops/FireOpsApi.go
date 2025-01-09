@@ -10,11 +10,13 @@ import (
 	"github.com/uoul/fireops-edge-dashboard/domain"
 	appError "github.com/uoul/fireops-edge-dashboard/error"
 	"github.com/uoul/go-common/async"
+	"github.com/uoul/go-common/log"
 )
 
 type FireOpsApi struct {
 	baseUrl    string
 	apiToken   string
+	logger     log.ILogger
 	httpClient *http.Client
 }
 
@@ -73,10 +75,11 @@ func (f *FireOpsApi) GetOperation(ctx context.Context, operationId string) chan 
 	return r
 }
 
-func NewFireOpsApi(baseUrl string, apiToken string) IFireOpsApi {
+func NewFireOpsApi(baseUrl string, apiToken string, logger log.ILogger) IFireOpsApi {
 	return &FireOpsApi{
 		baseUrl:  baseUrl,
 		apiToken: apiToken,
+		logger:   logger,
 
 		httpClient: http.DefaultClient,
 	}
