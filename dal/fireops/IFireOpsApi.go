@@ -3,7 +3,7 @@ package fireops
 import (
 	"context"
 
-	"github.com/uoul/fireops-edge-dashboard/domain"
+	"github.com/fireops-software/fireops-edge-dashboard/domain"
 	"github.com/uoul/go-common/async"
 )
 

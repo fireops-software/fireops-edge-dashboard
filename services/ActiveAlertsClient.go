@@ -4,12 +4,12 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/uoul/fireops-edge-dashboard/domain"
+	"github.com/fireops-software/fireops-edge-dashboard/domain"
 	"github.com/uoul/go-common/async"
 	"github.com/uoul/go-common/log"
 
+	appError "github.com/fireops-software/fireops-edge-dashboard/error"
 	amqp "github.com/rabbitmq/amqp091-go"
-	appError "github.com/uoul/fireops-edge-dashboard/error"
 )
 
 // ----------------------------------------------------------------------

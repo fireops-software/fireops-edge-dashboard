@@ -7,8 +7,8 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/uoul/fireops-edge-dashboard/domain"
-	appError "github.com/uoul/fireops-edge-dashboard/error"
+	"github.com/fireops-software/fireops-edge-dashboard/domain"
+	appError "github.com/fireops-software/fireops-edge-dashboard/error"
 	"github.com/uoul/go-common/async"
 	"github.com/uoul/go-common/log"
 )

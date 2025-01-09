@@ -8,8 +8,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/uoul/fireops-edge-dashboard/dal/fireops"
-	"github.com/uoul/fireops-edge-dashboard/domain"
+	"github.com/fireops-software/fireops-edge-dashboard/dal/fireops"
+	"github.com/fireops-software/fireops-edge-dashboard/domain"
 	"github.com/uoul/go-common/async"
 	"github.com/uoul/go-common/log"
 )

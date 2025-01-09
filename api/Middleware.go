@@ -3,8 +3,8 @@ package api
 import (
 	"net/http"
 
+	appError "github.com/fireops-software/fireops-edge-dashboard/error"
 	"github.com/gin-gonic/gin"
-	appError "github.com/uoul/fireops-edge-dashboard/error"
 )
 
 func (e *ApiEnv) useCors() func(ctx *gin.Context) {

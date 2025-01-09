@@ -3,10 +3,10 @@ package main
 import (
 	"time"
 
-	"github.com/uoul/fireops-edge-dashboard/api"
-	"github.com/uoul/fireops-edge-dashboard/dal/fireops"
-	"github.com/uoul/fireops-edge-dashboard/domain"
-	"github.com/uoul/fireops-edge-dashboard/services"
+	"github.com/fireops-software/fireops-edge-dashboard/api"
+	"github.com/fireops-software/fireops-edge-dashboard/dal/fireops"
+	"github.com/fireops-software/fireops-edge-dashboard/domain"
+	"github.com/fireops-software/fireops-edge-dashboard/services"
 	"github.com/uoul/go-common/config"
 	"github.com/uoul/go-common/log"
 )

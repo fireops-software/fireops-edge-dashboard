@@ -3,10 +3,10 @@ package api
 import (
 	"fmt"
 
+	"github.com/fireops-software/fireops-edge-dashboard/domain"
+	"github.com/fireops-software/fireops-edge-dashboard/services"
 	"github.com/gin-gonic/contrib/static"
 	"github.com/gin-gonic/gin"
-	"github.com/uoul/fireops-edge-dashboard/domain"
-	"github.com/uoul/fireops-edge-dashboard/services"
 	"github.com/uoul/go-common/log"
 )
 

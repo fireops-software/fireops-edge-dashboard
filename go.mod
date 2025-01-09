@@ -1,4 +1,4 @@
-module github.com/uoul/fireops-edge-dashboard
+module github.com/fireops-software/fireops-edge-dashboard
 
 go 1.23.3
 
