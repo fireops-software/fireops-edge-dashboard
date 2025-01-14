@@ -3,6 +3,7 @@ package services
 import (
 	"encoding/json"
 	"fmt"
+	"time"
 
 	"github.com/fireops-software/fireops-edge-dashboard/domain"
 	"github.com/uoul/go-common/async"
@@ -26,7 +27,8 @@ type ActiveAlertsClient struct {
 	logger     log.ILogger
 	stop       chan any
 
-	clients map[async.Stream[[]domain.Operation]]bool
+	retryInterval time.Duration
+	clients       map[async.Stream[[]domain.Operation]]bool
 }
 
 // ----------------------------------------------------------------------
@@ -52,7 +54,25 @@ func (a *ActiveAlertsClient) Close() error {
 	return nil
 }
 
-func (a *ActiveAlertsClient) Run() error {
+func (a *ActiveAlertsClient) Run() {
+	for {
+		select {
+		case <-a.stop:
+			return
+		default:
+			err := a.execService()
+			if err != nil {
+				a.logger.Error(err.Error())
+				time.Sleep(a.retryInterval)
+			}
+		}
+	}
+}
+
+// ----------------------------------------------------------------------
+// Private
+// ----------------------------------------------------------------------
+func (a *ActiveAlertsClient) execService() error {
 	conn, err := amqp.Dial(fmt.Sprintf("amqp://%s:%s@%s:%d", a.user, a.password, a.host, a.port))
 	if err != nil {
 		return appError.NewErrRabbitMq("failed to dial rabbitmq - %v", err)
@@ -101,11 +121,19 @@ func (a *ActiveAlertsClient) Run() error {
 		return appError.NewErrRabbitMq("failed to create consumer - %v", err)
 	}
 
-LP1:
+	// Successfully connected to rabbitmq
+	a.logger.Infof("Listening for new alerts on rabbitmq (%s) at exchange '%s'...", conn.RemoteAddr().String(), a.exchange)
+
+	// Listen on close event
+	closeChan := conn.NotifyClose(make(chan *amqp.Error))
+
+	// Execute service
 	for {
 		select {
 		case <-a.stop:
-			break LP1
+			return nil
+		case err := <-closeChan:
+			return err
 		case msg := <-msgs:
 			// Parse incomming message
 			wasMsg := domain.WasMsg{}
@@ -115,6 +143,7 @@ LP1:
 					Result: nil,
 					Error:  err,
 				})
+				a.logger.Errorf("failed to parse incomming message - %v", err)
 				break
 			}
 			// Convert incomming message to needed domain object
@@ -126,12 +155,8 @@ LP1:
 			})
 		}
 	}
-	return nil
 }
 
-// ----------------------------------------------------------------------
-// Private
-// ----------------------------------------------------------------------
 func convertWasMsgToOperations(wasMsg *domain.WasMsg) []domain.Operation {
 	operations := []domain.Operation{}
 	for alertId, alert := range wasMsg.Alerts {
@@ -173,6 +198,12 @@ func WithActiveAlertsClientBufferSize(size uint) func(*ActiveAlertsClient) {
 	}
 }
 
+func WithActiveAlertsClientRetryInterval(interval time.Duration) func(*ActiveAlertsClient) {
+	return func(aac *ActiveAlertsClient) {
+		aac.retryInterval = interval
+	}
+}
+
 // ----------------------------------------------------------------------
 // Constructor
 // ----------------------------------------------------------------------
@@ -186,6 +217,8 @@ func NewActiveAlertsClient(host string, port uint16, user, password, exchange st
 		buffersize: 0,
 		stop:       make(chan any),
 		logger:     logger,
-		clients:    map[async.Stream[[]domain.Operation]]bool{},
+
+		retryInterval: 10 * time.Second,
+		clients:       map[async.Stream[[]domain.Operation]]bool{},
 	}
 }

@@ -28,7 +28,7 @@
             "mode": "auto",
             "program": "${workspaceFolder}/main.go",
             "env": {
-                "RABBITMQ_HOST": "172.20.10.5",
+                "RABBITMQ_HOST": "192.168.178.21",
                 "RABBITMQ_PORT": "5672",
                 "RABBITMQ_USER": "guest",
                 "RABBITMQ_PW": "guest",

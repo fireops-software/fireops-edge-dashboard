@@ -14,10 +14,13 @@ type ApiEnv struct {
 	activeAlertsCache *services.ActiveAlertsCache
 	fireDepInfo       *domain.FireDepInfo
 	logger            log.ILogger
+	releaseMode       bool
 }
 
 func (a *ApiEnv) Run(port uint16) {
-	gin.SetMode(gin.ReleaseMode)
+	if a.releaseMode {
+		gin.SetMode(gin.ReleaseMode)
+	}
 	router := gin.New()
 	router.Use(static.Serve("/", static.LocalFile("wwwroot", true)))
 
@@ -32,13 +35,25 @@ func (a *ApiEnv) Run(port uint16) {
 	apiV1.GET("/operations/notification", a.getActiveAlertsStream)
 	apiV1.GET("/operations", a.getActiveAlerts)
 
+	a.logger.Infof("Local api running on port %d", port)
 	router.Run(fmt.Sprintf(":%v", port))
 }
 
-func NewApi(activeAlertsCache *services.ActiveAlertsCache, fireDepInfo *domain.FireDepInfo, logger log.ILogger) *ApiEnv {
-	return &ApiEnv{
+func NewApi(activeAlertsCache *services.ActiveAlertsCache, fireDepInfo *domain.FireDepInfo, logger log.ILogger, opts ...func(*ApiEnv)) *ApiEnv {
+	api := &ApiEnv{
 		activeAlertsCache: activeAlertsCache,
 		fireDepInfo:       fireDepInfo,
 		logger:            logger,
+		releaseMode:       false,
+	}
+	for _, o := range opts {
+		o(api)
+	}
+	return api
+}
+
+func WithApiReleaseMode() func(*ApiEnv) {
+	return func(ae *ApiEnv) {
+		ae.releaseMode = true
 	}
 }

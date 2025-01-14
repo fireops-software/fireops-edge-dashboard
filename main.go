@@ -9,27 +9,40 @@ import (
 	"github.com/fireops-software/fireops-edge-dashboard/services"
 	"github.com/uoul/go-common/config"
 	"github.com/uoul/go-common/log"
+	"github.com/uoul/go-common/resource"
+)
+
+const (
+	SHUTDOWN_TIMEOUT = time.Duration(20) * time.Second
 )
 
 func main() {
+
+	// Create ConfigProvider
 	cp := config.NewEnvVarProvider()
+
+	// Create Logger
 	logger := log.NewConsoleLogger(
 		log.StringToLogLevel(cp.StringOrDefault("LOG_LEVEL", ""), log.INFO),
 	)
 
+	// Create ResourceManager
+	rm := resource.NewResourceManager(SHUTDOWN_TIMEOUT, logger)
+
+	// Create fireops api
+	fireOpsApi := fireops.NewFireOpsApi(
+		cp.StringOrDefault("FIREOPS_BASE_URL", ""),
+		cp.StringOrDefault("FIREOPS_TOKEN", ""),
+		logger,
+	)
+
+	// Create services
 	activeAlertsClient := services.NewActiveAlertsClient(
 		cp.StringOrDefault("RABBITMQ_HOST", "localhost"),
 		cp.UInt16OrDefault("RABBITMQ_PORT", 5672),
 		cp.StringOrDefault("RABBITMQ_USER", ""),
 		cp.StringOrDefault("RABBITMQ_PW", ""),
 		cp.StringOrDefault("RABBITMQ_EXCHANGE", ""),
-		logger,
-	)
-	defer activeAlertsClient.Close()
-
-	fireOpsApi := fireops.NewFireOpsApi(
-		cp.StringOrDefault("FIREOPS_BASE_URL", ""),
-		cp.StringOrDefault("FIREOPS_TOKEN", ""),
 		logger,
 	)
 
@@ -41,8 +54,8 @@ func main() {
 			time.Duration(cp.IntOrDefault("FIREOPS_POLL_INTERVAL", 20))*time.Second,
 		),
 	)
-	defer activeAlertsCache.Close()
 
+	// Create Api
 	api := api.NewApi(
 		activeAlertsCache,
 		&domain.FireDepInfo{
@@ -51,11 +64,17 @@ func main() {
 			LogoUrl: cp.StringOrDefault("FIREDEP_LOGO_URL", ""),
 		},
 		logger,
+		api.WithApiReleaseMode(),
 	)
 
+	// Run Services
 	go activeAlertsClient.Run()
+	rm.Register(activeAlertsClient)
+
 	go activeAlertsCache.Run()
+	rm.Register(activeAlertsCache)
+
+	// Run Api
 	apiPort := cp.UInt16OrDefault("API_PORT", 80)
-	logger.Infof("Listening on for incomming connections on port %d", apiPort)
 	api.Run(apiPort)
 }
