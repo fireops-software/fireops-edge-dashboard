@@ -1,7 +1,8 @@
 package domain
 
 type FireDepInfo struct {
-	Name    string `json:"name"`
-	Address string `json:"address"`
-	LogoUrl string `json:"logoUrl"`
+	Name                string `json:"name"`
+	Address             string `json:"address"`
+	LogoUrl             string `json:"logoUrl"`
+	MaxTimeTextToSpeech uint   `json:"maxTimeTextToSpeech"`
 }

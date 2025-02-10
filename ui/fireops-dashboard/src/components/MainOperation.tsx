@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { FireDepInfo } from "../domain/FireDepInfo";
 import { Operation } from "../domain/Operation";
 import { createGoogleMapsNavUrl } from "../utils/MapUtil";
@@ -7,7 +8,34 @@ const MainOperation = ({fireDepInfo, operation}: {fireDepInfo: FireDepInfo, oper
 
   // Prefer coordinates
   const destAddr = operation.latitude && operation.longitude ? `${operation.latitude},${operation.longitude}` : operation.location
+
+  useEffect(() => {
+    // Create text to read
+    const alertText = `${operation.sub_eng ?? operation.category ?? ""} - ${operation.event_alarmtext ?? ""} - Alarmstufe ${operation.alarm_lev} - ${operation.location ?? ""}`;
+    const utterance = new SpeechSynthesisUtterance(alertText);
+
+    // Select german language
+    const voices = speechSynthesis.getVoices().filter((voice) => voice.lang === "de-DE");
+    utterance.voice = voices[0]; 
   
+    // Register onend handler for looping
+    utterance.onend = () => {
+      speechSynthesis.speak(utterance);
+    };
+  
+    // Start voice output
+    speechSynthesis.speak(utterance);
+
+    // On timeout -> Stop voice output
+    const timeout = setTimeout(()=> speechSynthesis.cancel(), fireDepInfo.maxTimeTextToSpeech * 1000)
+  
+    // Cleanup
+    return () => {
+      speechSynthesis.cancel(); 
+      clearTimeout(timeout)
+    };
+  }, [operation]);
+
   return (
     <div className="lg:flex flex-grow hidden">
       <div className="w-5/12 flex flex-col flex-grow text-xl mr-4">

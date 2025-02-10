@@ -3,5 +3,6 @@ export class FireDepInfo {
     public name: string = "",
     public address: string = "",
     public logoUrl: string = "",
+    public maxTimeTextToSpeech: number = 0,
   ){}
 }

@@ -59,9 +59,10 @@ func main() {
 	api := api.NewApi(
 		activeAlertsCache,
 		&domain.FireDepInfo{
-			Name:    cp.StringOrDefault("FIREDEP_NAME", ""),
-			Address: cp.StringOrDefault("FIREDEP_ADDR", ""),
-			LogoUrl: cp.StringOrDefault("FIREDEP_LOGO_URL", ""),
+			Name:                cp.StringOrDefault("FIREDEP_NAME", ""),
+			Address:             cp.StringOrDefault("FIREDEP_ADDR", ""),
+			LogoUrl:             cp.StringOrDefault("FIREDEP_LOGO_URL", ""),
+			MaxTimeTextToSpeech: cp.UIntOrDefault("FIREDEP_MAX_TIME_TEXT_TO_SPEECH", 0),
 		},
 		logger,
 		api.WithApiReleaseMode(),
