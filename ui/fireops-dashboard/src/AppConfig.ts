@@ -1,4 +1,4 @@
 const AppConfig = {
-  backendBaseUrl: "http://localhost:8080"
+  backendBaseUrl: ""
 }
 export default AppConfig;
