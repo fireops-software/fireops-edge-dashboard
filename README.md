@@ -20,6 +20,7 @@ All configuration is done via environmental variables because the intended form 
 | FIREDEP_NAME | "" | Name of fire department (shown in headline) |
 | FIREDEP_ADDR | "" | Address of latitude, longitude of firedepartment (used as src for map navigation) |
 | FIREDEP_LOGO_URL | "" | Url for Logo, that is displayed in left upper corner |
+| FIREDEP_MAX_TIME_TEXT_TO_SPEECH | 0 | Time, how long the voice output will play in a loop (0 -> disabled) |
 ||||
 | API_PORT | 80 | Port, via the dashboard will be available |
 | LOG_LEVEL | INFO | Possible TRACE, DEBUG, INFO, WARNING, ERROR, FATAL, OFF |
