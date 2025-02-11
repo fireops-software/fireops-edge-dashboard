@@ -3,11 +3,32 @@ import { FireDepInfo } from "../domain/FireDepInfo";
 import { Operation } from "../domain/Operation";
 import { createGoogleMapsNavUrl } from "../utils/MapUtil";
 import ItemDisplay from "./ItemDisplay";
+import AppConfig from "../AppConfig";
 
 const MainOperation = ({fireDepInfo, operation}: {fireDepInfo: FireDepInfo, operation: Operation}) => {
 
   // Prefer coordinates
   const destAddr = operation.latitude && operation.longitude ? `${operation.latitude},${operation.longitude}` : operation.location
+
+  const getVoices = () => {
+    return new Promise<SpeechSynthesisVoice[]>((resolve, reject) => {
+      let errorCounter = 0;
+      const id = setInterval(()=>{
+        const voices = speechSynthesis.getVoices()
+        if(voices.length !== 0){
+          resolve(voices)
+          clearInterval(id)
+        } else {
+          if(errorCounter >= AppConfig.getVoiceRetries) {
+            clearInterval(id)
+            reject("failed to get voices")
+          }
+          errorCounter++;
+        }
+      }, AppConfig.getVoiceRetryInterval)
+    })
+  }
+
 
   useEffect(() => {
     // Create text to read
@@ -15,16 +36,17 @@ const MainOperation = ({fireDepInfo, operation}: {fireDepInfo: FireDepInfo, oper
     const utterance = new SpeechSynthesisUtterance(alertText);
 
     // Select german language
-    const voices = speechSynthesis.getVoices().filter((voice) => voice.lang === "de-DE");
-    utterance.voice = voices[0]; 
+    //const voices = speechSynthesis.getVoices().filter((voice) => voice.lang === "de-DE");
+    getVoices().then((v: SpeechSynthesisVoice[]) => {
+      utterance.voice = v.filter((voice) => voice.lang === AppConfig.getVoiceLanguage)[0]
+      // Start voice output
+      speechSynthesis.speak(utterance);
+    }).catch(err => console.error(err))
   
     // Register onend handler for looping
     utterance.onend = () => {
       speechSynthesis.speak(utterance);
     };
-  
-    // Start voice output
-    speechSynthesis.speak(utterance);
 
     // On timeout -> Stop voice output
     const timeout = setTimeout(()=> speechSynthesis.cancel(), fireDepInfo.maxTimeTextToSpeech * 1000)
