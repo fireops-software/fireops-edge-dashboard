@@ -9,4 +9,5 @@ import (
 
 type IFireOpsApi interface {
 	GetOperation(ctx context.Context, operationId string) chan async.ActionResult[domain.Operation]
+	GetUnits(ctx context.Context) chan async.ActionResult[[]domain.Unit]
 }
