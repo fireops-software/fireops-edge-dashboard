@@ -51,13 +51,20 @@ func main() {
 		fireOpsApi,
 		logger,
 		services.WithFireOpsRefreshRate(
-			time.Duration(cp.IntOrDefault("FIREOPS_POLL_INTERVAL", 20))*time.Second,
+			time.Duration(cp.IntOrDefault("FIREOPS_OPERATIONS_POLL_INTERVAL", 20))*time.Second,
 		),
+	)
+
+	unitsCache := services.NewUnitStateCache(
+		fireOpsApi,
+		logger,
+		services.WithUnitPollInterval(time.Duration(cp.IntOrDefault("FIREOPS_UNITS_POLL_INTERVAL", 60))*time.Second),
 	)
 
 	// Create Api
 	api := api.NewApi(
 		activeAlertsCache,
+		unitsCache,
 		&domain.FireDepInfo{
 			Name:                cp.StringOrDefault("FIREDEP_NAME", ""),
 			Address:             cp.StringOrDefault("FIREDEP_ADDR", ""),
@@ -74,6 +81,9 @@ func main() {
 
 	go activeAlertsCache.Run()
 	rm.Register(activeAlertsCache)
+
+	go unitsCache.Run()
+	rm.Register(unitsCache)
 
 	// Run Api
 	apiPort := cp.UInt16OrDefault("API_PORT", 80)

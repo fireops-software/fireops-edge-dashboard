@@ -41,7 +41,7 @@ func (a *ActiveAlertsCache) Close() error {
 }
 
 // Run implements INotificationService.
-func (a *ActiveAlertsCache) Run() error {
+func (a *ActiveAlertsCache) Run() {
 	// Subscribe on WAS events
 	wasMsgCh := a.activeAlertsClient.Subscribe()
 	defer a.activeAlertsClient.Unsubscribe(wasMsgCh)
@@ -81,8 +81,10 @@ LP1:
 				}
 			}
 			if backup != crc(a.operations) {
+				current := a.getCurrentOperations()
+				a.logger.Infof("active alerts changed: %s", mustJson(current))
 				a.notify(async.ActionResult[[]domain.Operation]{
-					Result: a.getCurrentOperations(),
+					Result: current,
 					Error:  nil,
 				})
 			}
@@ -101,14 +103,15 @@ LP1:
 				a.mux.Unlock()
 			}
 			if backup != crc(a.operations) {
+				current := a.getCurrentOperations()
+				a.logger.Infof("active alerts changed: %s", mustJson(current))
 				a.notify(async.ActionResult[[]domain.Operation]{
-					Result: a.getCurrentOperations(),
+					Result: current,
 					Error:  nil,
 				})
 			}
 		}
 	}
-	return nil
 }
 
 // Subscribe implements INotificationService.
@@ -125,11 +128,6 @@ func (a *ActiveAlertsCache) Subscribe() async.Stream[[]domain.Operation] {
 // Unsubscribe implements INotificationService.
 func (a *ActiveAlertsCache) Unsubscribe(sub async.Stream[[]domain.Operation]) {
 	delete(a.clients, sub)
-}
-
-// Get active operations
-func (a *ActiveAlertsCache) GetOperations() []domain.Operation {
-	return a.getCurrentOperations()
 }
 
 // -------------------------------------------------------------------------------
@@ -179,7 +177,7 @@ func WithFireOpsRefreshRate(rate time.Duration) func(*ActiveAlertsCache) {
 // ----------------------------------------------------------------------
 // Constructor
 // ----------------------------------------------------------------------
-func NewActiveAlertsCache(activeAlertsClient INotificationService[[]domain.Operation], fireOpsApi fireops.IFireOpsApi, logger log.ILogger, opts ...func(*ActiveAlertsCache)) *ActiveAlertsCache {
+func NewActiveAlertsCache(activeAlertsClient INotificationService[[]domain.Operation], fireOpsApi fireops.IFireOpsApi, logger log.ILogger, opts ...func(*ActiveAlertsCache)) INotificationService[[]domain.Operation] {
 	aac := &ActiveAlertsCache{
 		activeAlertsClient: activeAlertsClient,
 		fireOpsApi:         fireOpsApi,

@@ -15,7 +15,8 @@ All configuration is done via environmental variables because the intended form 
 ||||
 | FIREOPS_BASE_URL | "" | FireOps url of FireOps instance (e.g. https://<HOSTNAME>:<PORT>) |
 | FIREOPS_TOKEN | "" | Api token (can be created in FireOps frontend by Administrator)|
-| FIREOPS_POLL_INTERVAL | 20 | Polling interval for open operations on fireOps api (if no open operations on RabbitMQ --> no polling) |
+| FIREOPS_OPERATIONS_POLL_INTERVAL | 20 | Polling interval for open operations on fireOps api (if no open operations on RabbitMQ --> no polling) |
+| FIREOPS_UNITS_POLL_INTERVAL | 60 | Polling interval for unit state |
 ||||
 | FIREDEP_NAME | "" | Name of fire department (shown in headline) |
 | FIREDEP_ADDR | "" | Address of latitude, longitude of firedepartment (used as src for map navigation) |

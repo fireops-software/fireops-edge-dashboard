@@ -35,7 +35,7 @@
                 "RABBITMQ_PW": "guest",
                 "RABBITMQ_EXCHANGE": "ActiveAlerts",
                 "FIREOPS_BASE_URL": "https://einsatz.bfk-perg.at",
-                "FIREOPS_TOKEN": "",
+                "FIREOPS_TOKEN": "MSfuKgTjYEP9q2gJXuioUP6yeEBqjwGw2VuDnf2Vb1038665",
                 "FIREDEP_NAME": "Freiwillige Feuerwehr Klam",
                 "FIREDEP_ADDR": "Klam 59, 4352 Klam",
                 "FIREDEP_LOGO_URL": "https://sybos.ooelfv.at/sybServices/getImage.php?typ=abteilung&id=1000",

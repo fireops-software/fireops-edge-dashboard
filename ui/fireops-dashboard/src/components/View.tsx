@@ -5,12 +5,15 @@ import MainOperation from "./MainOperation";
 import { FireDepInfo } from "../domain/FireDepInfo";
 import { getSmallerTimeStamp } from "../utils/TimeUtil";
 import AppConfig from "../AppConfig";
+import { UnitState } from "../domain/UnitState";
+import Unit from "./Unit";
 
 const View = ({fireDepInfo}: {fireDepInfo: FireDepInfo}) => {
   const [operations, setOperations] = useState<Operation[]>([])
+  const [units, setUnits] = useState<UnitState[]>([])
   
   useEffect(()=>{
-    const es: EventSource = new EventSource(`${AppConfig.backendBaseUrl}/api/v1/operations/notification`);
+    const es: EventSource = new EventSource(`${AppConfig.backendBaseUrl}/api/v1/operations`);
     es.onerror = (e) => console.error(e);
     es.onmessage = (e) => {
       let o: Operation[] = JSON.parse(e.data);
@@ -26,6 +29,27 @@ const View = ({fireDepInfo}: {fireDepInfo: FireDepInfo}) => {
     return () => es.close();
   }, []);
 
+  useEffect(() => {
+    const es: EventSource = new EventSource(`${AppConfig.backendBaseUrl}/api/v1/units`);
+    es.onerror = (e) => console.error(e)
+    es.onmessage = msg => {
+      let u: UnitState[] = JSON.parse(msg.data)
+      if (u) {
+        u?.sort((a: UnitState, b: UnitState) => {
+          if(a == b || !a.unid_long || !b.unid_long)
+            return 0
+          else
+            return a.unid_long < b.unid_long ? -1 : 1
+        })
+        setUnits(u)
+      } else {
+        setUnits([])
+      }
+      
+    }
+    return () => es.close()
+  }, [])
+
   let content;
   if(operations.length > 0) {
     content = 
@@ -36,8 +60,11 @@ const View = ({fireDepInfo}: {fireDepInfo: FireDepInfo}) => {
     
   } else {
     content = 
-      <div className="flex items-center justify-center w-full">
-        <p className="text-3xl opacity-25">Keine laufenden Einsätze</p>
+      <div className="flex flex-col w-full h-full">
+        <p className="flex justify-center items-center text-3xl opacity-25 flex-grow">Keine laufenden Einsätze</p>
+        <div className="flex justify-center mb-8 flex-wrap">
+          {units.filter(u => u.unityp != "FEUERW").map(u => <Unit unit={u} key={u.unid_long} />)}
+        </div>
       </div>
     
   }

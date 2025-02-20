@@ -2,6 +2,7 @@ package api
 
 import (
 	"fmt"
+	"reflect"
 
 	"github.com/fireops-software/fireops-edge-dashboard/domain"
 	"github.com/fireops-software/fireops-edge-dashboard/services"
@@ -11,10 +12,16 @@ import (
 )
 
 type ApiEnv struct {
-	activeAlertsCache *services.ActiveAlertsCache
+	activeAlertsCache services.INotificationService[[]domain.Operation]
+	unitsCache        services.INotificationService[[]domain.Unit]
 	fireDepInfo       *domain.FireDepInfo
 	logger            log.ILogger
 	releaseMode       bool
+}
+
+type ErrorResponse struct {
+	Type    string `json:"type"`
+	Message string `json:"message"`
 }
 
 func (a *ApiEnv) Run(port uint16) {
@@ -32,16 +39,23 @@ func (a *ApiEnv) Run(port uint16) {
 		a.errorTranslation(),
 	)
 	apiV1.GET("/fireDepInfo", a.getFireDepInfo)
-	apiV1.GET("/operations/notification", a.getActiveAlertsStream)
-	apiV1.GET("/operations", a.getActiveAlerts)
+	apiV1.GET("/operations", a.getActiveAlertsStream)
+	apiV1.GET("/units", a.getUnitsStream)
 
 	a.logger.Infof("Local api running on port %d", port)
 	router.Run(fmt.Sprintf(":%v", port))
 }
 
-func NewApi(activeAlertsCache *services.ActiveAlertsCache, fireDepInfo *domain.FireDepInfo, logger log.ILogger, opts ...func(*ApiEnv)) *ApiEnv {
+func WithApiReleaseMode() func(*ApiEnv) {
+	return func(ae *ApiEnv) {
+		ae.releaseMode = true
+	}
+}
+
+func NewApi(activeAlertsCache services.INotificationService[[]domain.Operation], unitsCache services.INotificationService[[]domain.Unit], fireDepInfo *domain.FireDepInfo, logger log.ILogger, opts ...func(*ApiEnv)) *ApiEnv {
 	api := &ApiEnv{
 		activeAlertsCache: activeAlertsCache,
+		unitsCache:        unitsCache,
 		fireDepInfo:       fireDepInfo,
 		logger:            logger,
 		releaseMode:       false,
@@ -52,8 +66,9 @@ func NewApi(activeAlertsCache *services.ActiveAlertsCache, fireDepInfo *domain.F
 	return api
 }
 
-func WithApiReleaseMode() func(*ApiEnv) {
-	return func(ae *ApiEnv) {
-		ae.releaseMode = true
+func NewErrorResponse(err error) *ErrorResponse {
+	return &ErrorResponse{
+		Type:    reflect.TypeOf(err).Name(),
+		Message: err.Error(),
 	}
 }
