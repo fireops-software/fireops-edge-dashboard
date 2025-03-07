@@ -62,8 +62,14 @@ const View = ({fireDepInfo}: {fireDepInfo: FireDepInfo}) => {
     content = 
       <div className="flex flex-col w-full h-full">
         <p className="flex justify-center items-center text-3xl opacity-25 flex-grow">Keine laufenden Einsätze</p>
-        <div className="flex justify-center mb-8 flex-wrap">
-          {units.filter(u => u.unityp != "FEUERW").map(u => <Unit unit={u} key={u.unid_long} />)}
+        <div className="flex justify-center mb-8 flex-wrap items-end">
+          {units.sort((a, b) => {
+            if(a.unityp == "FEUERW" && b.unityp == "FEUERW")
+              return 0;
+            if(a.unityp == "FEUERW")
+              return 1;
+            return 0;
+          }).map(u => <Unit unit={u} key={u.unid_long} />)}
         </div>
       </div>
     

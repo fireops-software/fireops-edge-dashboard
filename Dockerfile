@@ -11,7 +11,7 @@ ENV PATH=$PATH:/go/bin
 WORKDIR /app
 COPY . .
 RUN go build -o fireops-dashboard main.go
-RUN cd ui/fireops-dashboard && npx vite build
+RUN cd ui/fireops-dashboard && npm install && npx vite build
 
 # Deploy the application binary into a lean image
 FROM alpine:latest AS build-release-stage
