@@ -4,7 +4,7 @@ type Unit struct {
 	UnidLong        *string `json:"unid_long"`
 	UniTyp          *string `json:"unityp"`
 	UnitStatus      *string `json:"unit_status"`
-	UnitStatusId    *int    `json:"unit_status_id"`
+	UnitStatusId    any     `json:"unit_status_id"`
 	UnitStatusColor *string `json:"unit_status_color"`
 	ActTetraGroup   *string `json:"act_tetragroup"`
 }

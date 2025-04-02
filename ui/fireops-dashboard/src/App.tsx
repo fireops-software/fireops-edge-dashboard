@@ -9,14 +9,15 @@ function App() {
   const [ffInfo, setFfInfo] = useState(new FireDepInfo());
   useEffect(() => {
     fetch(`${AppConfig.backendBaseUrl}/api/v1/fireDepInfo`)
-      .then((data) => data.json().then((fdi: FireDepInfo) => setFfInfo(fdi)))
+      .then((data) => data.json().then((fdi: FireDepInfo) => 
+        setFfInfo(fdi)))
   }, []);
 
   return (
     <div className="flex flex-col w-screen h-screen">
       <Header fireDepInfo={ffInfo}/>
       <View fireDepInfo={ffInfo}/>
-      <Footer />
+      <Footer fireDepInfo={ffInfo}/>
     </div>
   )
 }

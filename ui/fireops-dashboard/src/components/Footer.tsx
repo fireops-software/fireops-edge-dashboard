@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
+import { FireDepInfo } from "../domain/FireDepInfo";
 
-const Footer = () => {
+const Footer = ({fireDepInfo}: {fireDepInfo: FireDepInfo}) => {
   const [datetime, setDateTime] = useState(new Date())
 
   useEffect(() => {
@@ -14,7 +15,10 @@ const Footer = () => {
         <p>{ datetime.toLocaleDateString('de-DE') }</p>
       </div>
       <div className="flex flex-grow justify-center">
-        © FireOps
+        <div className="flex flex-col items-center">
+          <span className="text-sm">© FireOps</span>
+          <span className="text-xs">Version { fireDepInfo.dashboardVersion }</span>
+        </div>
       </div>
       <div className="flex justify-end">
         <p className="">{ datetime.toLocaleTimeString('de-DE') }</p>

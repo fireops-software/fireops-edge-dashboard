@@ -13,6 +13,7 @@ import (
 )
 
 const (
+	VERSION          = "0.2.2"
 	SHUTDOWN_TIMEOUT = time.Duration(20) * time.Second
 )
 
@@ -66,6 +67,7 @@ func main() {
 		activeAlertsCache,
 		unitsCache,
 		&domain.FireDepInfo{
+			DashboardVersion:    VERSION,
 			Name:                cp.StringOrDefault("FIREDEP_NAME", ""),
 			Address:             cp.StringOrDefault("FIREDEP_ADDR", ""),
 			LogoUrl:             cp.StringOrDefault("FIREDEP_LOGO_URL", ""),
