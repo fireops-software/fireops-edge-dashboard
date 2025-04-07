@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	VERSION          = "0.2.2"
+	VERSION          = "{VERSION}"
 	SHUTDOWN_TIMEOUT = time.Duration(20) * time.Second
 )
 
