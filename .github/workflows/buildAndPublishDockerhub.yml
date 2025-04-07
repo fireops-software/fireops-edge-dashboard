@@ -15,7 +15,7 @@ jobs:
       - name: Replace single file
         uses: richardrigutins/replace-in-files@v2
         with:
-          files: 'README.md'
+          files: 'main.go'
           search-text: '{VERSION}'
           replacement-text: ${{ vars.VERSION }}
 
