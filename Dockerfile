@@ -2,9 +2,9 @@ FROM node:22-alpine AS build-stage
 
 # install golang
 WORKDIR /
-RUN wget https://go.dev/dl/go1.23.3.linux-amd64.tar.gz \
-    && tar -xzf go1.23.3.linux-amd64.tar.gz \
-    && rm go1.23.3.linux-amd64.tar.gz
+RUN wget https://go.dev/dl/go1.24.2.linux-amd64.tar.gz \
+    && tar -xzf go1.24.2.linux-amd64.tar.gz \
+    && rm go1.24.2.linux-amd64.tar.gz
 ENV PATH=$PATH:/go/bin
 
 # set workdir for project
