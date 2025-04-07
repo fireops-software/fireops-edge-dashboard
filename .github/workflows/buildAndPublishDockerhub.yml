@@ -1,0 +1,37 @@
+name: golang-pipeline
+on: 
+  push:
+    branches:
+      - main
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Build and push Dockerhub
+        id: docker_build
+        uses: docker/build-push-action@v1
+        with:
+          dockerfile: ./Dockerfile
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          repository: uoul/ass-ext-fireops
+          tags: ${{ vars.VERSION }}
+      
+      - name: Create git tag
+        run: |
+          git tag ${{ vars.VERSION }}
+
+      - name: Push git tag
+        run: git push origin ${{ vars.VERSION }}
+
+      - name: Create Release
+        uses: ncipollo/release-action@v1
