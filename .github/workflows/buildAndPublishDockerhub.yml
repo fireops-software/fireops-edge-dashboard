@@ -34,7 +34,6 @@ jobs:
 
       - name: Push git tag
         run: |
-          echo "${{ secrets.GH_TOKEN }}" | ssh-add -
           git push origin ${{ vars.VERSION }}
 
       - name: Create Release
