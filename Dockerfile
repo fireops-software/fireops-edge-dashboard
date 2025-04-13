@@ -1,5 +1,9 @@
 FROM node:22-alpine AS build-stage
 
+# get target platform
+ARG TARGETOS
+ARG TARGETARCH
+
 # install golang
 WORKDIR /
 RUN wget https://go.dev/dl/go1.24.2.linux-amd64.tar.gz \
@@ -10,7 +14,7 @@ ENV PATH=$PATH:/go/bin
 # set workdir for project
 WORKDIR /app
 COPY . .
-RUN go build -o fireops-dashboard main.go
+RUN GOOS=${TARGETOS} GOARCH=${TARGETARCH} go build -o fireops-dashboard main.go
 RUN cd ui/fireops-dashboard && npm install && npx vite build
 
 # Deploy the application binary into a lean image
