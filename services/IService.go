@@ -4,7 +4,6 @@ import "encoding/json"
 
 type IService interface {
 	Run()
-	Close() error
 }
 
 // -------------------------------------------------------------------------------

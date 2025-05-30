@@ -55,3 +55,25 @@ func (a *ApiEnv) getUnitsStream(ctx *gin.Context) {
 		}
 	})
 }
+
+func (a *ApiEnv) getHealthStream(ctx *gin.Context) {
+	updateCh := a.healtMonitor.Subscribe()
+	defer a.healtMonitor.Unsubscribe(updateCh)
+	ticker := time.NewTicker(10 * time.Second)
+	ctx.Stream(func(w io.Writer) bool {
+		select {
+		case <-ctx.Done():
+			return false
+		case <-ticker.C:
+			ctx.SSEvent("heartbeat", nil)
+			return true
+		case u := <-updateCh:
+			if u.Error == nil {
+				ctx.SSEvent("message", u.Result)
+			} else {
+				ctx.SSEvent("error", NewErrorResponse(u.Error))
+			}
+			return true
+		}
+	})
+}

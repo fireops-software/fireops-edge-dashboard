@@ -38,7 +38,7 @@
                 "FIREOPS_TOKEN": "MSfuKgTjYEP9q2gJXuioUP6yeEBqjwGw2VuDnf2Vb1038665",
                 "FIREDEP_NAME": "Freiwillige Feuerwehr Klam",
                 "FIREDEP_ADDR": "Klam 59, 4352 Klam",
-                "FIREDEP_LOGO_URL": "https://sybos.ooelfv.at/sybServices/getImage.php?typ=abteilung&id=1000",
+                "FIREDEP_LOGO_URL": "https://feuerwehr.klam.at/files/layout/FREIWILLIGE_FEUERWEHR_KLAM.png",
                 "FIREDEP_MAX_TIME_TEXT_TO_SPEECH": "30",
                 "API_PORT": "8080"
             },

@@ -14,6 +14,7 @@ import (
 type ApiEnv struct {
 	activeAlertsCache services.INotificationService[[]domain.Operation]
 	unitsCache        services.INotificationService[[]domain.Unit]
+	healtMonitor      services.INotificationService[[]domain.Health]
 	fireDepInfo       *domain.FireDepInfo
 	logger            log.ILogger
 	releaseMode       bool
@@ -41,6 +42,7 @@ func (a *ApiEnv) Run(port uint16) {
 	apiV1.GET("/fireDepInfo", a.getFireDepInfo)
 	apiV1.GET("/operations", a.getActiveAlertsStream)
 	apiV1.GET("/units", a.getUnitsStream)
+	apiV1.GET("/health", a.getHealthStream)
 
 	a.logger.Infof("Local api running on port %d", port)
 	router.Run(fmt.Sprintf(":%v", port))
@@ -52,10 +54,11 @@ func WithApiReleaseMode() func(*ApiEnv) {
 	}
 }
 
-func NewApi(activeAlertsCache services.INotificationService[[]domain.Operation], unitsCache services.INotificationService[[]domain.Unit], fireDepInfo *domain.FireDepInfo, logger log.ILogger, opts ...func(*ApiEnv)) *ApiEnv {
+func NewApi(activeAlertsCache services.INotificationService[[]domain.Operation], unitsCache services.INotificationService[[]domain.Unit], healthMonitor services.INotificationService[[]domain.Health], fireDepInfo *domain.FireDepInfo, logger log.ILogger, opts ...func(*ApiEnv)) *ApiEnv {
 	api := &ApiEnv{
 		activeAlertsCache: activeAlertsCache,
 		unitsCache:        unitsCache,
+		healtMonitor:      healthMonitor,
 		fireDepInfo:       fireDepInfo,
 		logger:            logger,
 		releaseMode:       false,

@@ -18,9 +18,9 @@ import (
 type UnitStateCache struct {
 	logger     log.ILogger
 	fireOpsApi fireops.IFireOpsApi
+	ctx        context.Context
 
 	clients map[async.Stream[[]domain.Unit]]bool
-	stop    chan any
 	units   []domain.Unit
 
 	pollInterval time.Duration
@@ -29,12 +29,6 @@ type UnitStateCache struct {
 // -------------------------------------------------------------------------------
 // Public
 // -------------------------------------------------------------------------------
-
-// Close implements INotificationService.
-func (u *UnitStateCache) Close() error {
-	u.stop <- true
-	return nil
-}
 
 // Run implements INotificationService.
 func (u *UnitStateCache) Run() {
@@ -45,7 +39,7 @@ func (u *UnitStateCache) Run() {
 LP1:
 	for {
 		select {
-		case <-u.stop:
+		case <-u.ctx.Done():
 			break LP1
 		case <-ticker.C:
 			ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
@@ -104,13 +98,13 @@ func WithUnitPollInterval(interval time.Duration) func(*UnitStateCache) {
 // ----------------------------------------------------------------------
 // Constructor
 // ----------------------------------------------------------------------
-func NewUnitStateCache(fireOpsApi fireops.IFireOpsApi, logger log.ILogger, opts ...func(*UnitStateCache)) *UnitStateCache {
+func NewUnitStateCache(ctx context.Context, fireOpsApi fireops.IFireOpsApi, logger log.ILogger, opts ...func(*UnitStateCache)) *UnitStateCache {
 	usc := &UnitStateCache{
 		logger:     logger,
 		fireOpsApi: fireOpsApi,
 
 		clients: map[async.Stream[[]domain.Unit]]bool{},
-		stop:    make(chan any),
+		ctx:     ctx,
 
 		pollInterval: time.Minute,
 	}
