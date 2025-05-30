@@ -4,27 +4,31 @@ import (
 	"bytes"
 	"context"
 	"encoding/gob"
+	"encoding/json"
 	"hash/crc32"
 	"sync"
 	"time"
 
 	"github.com/fireops-software/fireops-edge-dashboard/dal/fireops"
 	"github.com/fireops-software/fireops-edge-dashboard/domain"
+	"github.com/rabbitmq/amqp091-go"
 	"github.com/uoul/go-common/async"
 	"github.com/uoul/go-common/log"
+	"github.com/uoul/go-common/messaging"
 )
 
 // -------------------------------------------------------------------------------
 // Type
 // -------------------------------------------------------------------------------
 type ActiveAlertsCache struct {
-	activeAlertsClient INotificationService[[]domain.Operation]
-	fireOpsApi         fireops.IFireOpsApi
-	logger             log.ILogger
-	fireOpsTickRate    time.Duration
+	messenger       messaging.IMessenger[messaging.RabbitMqExchange, amqp091.Delivery]
+	exchange        messaging.RabbitMqExchange
+	fireOpsApi      fireops.IFireOpsApi
+	logger          log.ILogger
+	fireOpsTickRate time.Duration
+	ctx             context.Context
 
 	clients map[async.Stream[[]domain.Operation]]bool
-	stop    chan any
 
 	mux        sync.Mutex
 	operations map[string]domain.Operation
@@ -34,17 +38,11 @@ type ActiveAlertsCache struct {
 // Public
 // -------------------------------------------------------------------------------
 
-// Close implements INotificationService.
-func (a *ActiveAlertsCache) Close() error {
-	a.stop <- true
-	return nil
-}
-
 // Run implements INotificationService.
 func (a *ActiveAlertsCache) Run() {
 	// Subscribe on WAS events
-	wasMsgCh := a.activeAlertsClient.Subscribe()
-	defer a.activeAlertsClient.Unsubscribe(wasMsgCh)
+	wasMsgCh := a.messenger.Subscribe(a.exchange)
+	defer a.messenger.Unsubscribe(wasMsgCh)
 
 	// Create ticker for polling on fireOps api
 	ticker := time.NewTicker(a.fireOpsTickRate)
@@ -54,16 +52,26 @@ func (a *ActiveAlertsCache) Run() {
 LP1:
 	for {
 		select {
-		case <-a.stop:
+		case <-a.ctx.Done():
 			break LP1
-		case wasMsg := <-wasMsgCh:
-			backup := crc(a.operations)
-			if wasMsg.Error != nil {
-				a.logger.Errorf("%v", wasMsg.Error)
+		case rmsg := <-wasMsgCh:
+			if rmsg.Error != nil {
+				a.logger.Errorf("%v", rmsg.Error)
 				break
 			}
+			// Backup old operations
+			backup := crc(a.operations)
+			// Parse incomming alert from rabbitMq
+			var msg domain.WasMsg
+			err := json.Unmarshal(rmsg.Result.Body, &msg)
+			if err != nil {
+				a.logger.Errorf("failed to parse message from rabbitmq - %v", err)
+				break
+			}
+			wasMsg := convertWasMsgToOperations(&msg)
+
 			// Add new operations
-			for _, msg := range wasMsg.Result {
+			for _, msg := range wasMsg {
 				if msg.Num1 != nil {
 					if _, exists := a.operations[*msg.Num1]; !exists {
 						a.mux.Lock()
@@ -74,7 +82,7 @@ LP1:
 			}
 			// Remove old
 			for num_1 := range a.operations {
-				if !operationsContain(wasMsg.Result, num_1) {
+				if !operationsContain(wasMsg, num_1) {
 					a.mux.Lock()
 					delete(a.operations, num_1)
 					a.mux.Unlock()
@@ -165,6 +173,32 @@ func (a *ActiveAlertsCache) notify(msg async.ActionResult[[]domain.Operation]) {
 	}
 }
 
+func convertWasMsgToOperations(wasMsg *domain.WasMsg) []domain.Operation {
+	operations := []domain.Operation{}
+	for alertId, alert := range wasMsg.Alerts {
+		o := domain.Operation{
+			Eid:               nil,
+			Num1:              &alertId,
+			Location:          &alert.Location,
+			LocationInfo:      nil,
+			LocationInvolved:  nil,
+			Category:          &alert.Program,
+			TypEng:            &alert.OperationName,
+			SubEng:            nil,
+			AlarmLev:          &alert.Level,
+			EventAlarmtext:    &alert.Info,
+			CreateTime:        &alert.ReceiveTad,
+			FirstdispatchTime: nil,
+			Latitude:          nil,
+			Longitude:         nil,
+			CallerName:        &alert.Contact.Name,
+			CallerNumber:      &alert.Contact.PhoneNumber,
+		}
+		operations = append(operations, o)
+	}
+	return operations
+}
+
 // -------------------------------------------------------------------------------
 // Options
 // -------------------------------------------------------------------------------
@@ -177,12 +211,14 @@ func WithFireOpsRefreshRate(rate time.Duration) func(*ActiveAlertsCache) {
 // ----------------------------------------------------------------------
 // Constructor
 // ----------------------------------------------------------------------
-func NewActiveAlertsCache(activeAlertsClient INotificationService[[]domain.Operation], fireOpsApi fireops.IFireOpsApi, logger log.ILogger, opts ...func(*ActiveAlertsCache)) INotificationService[[]domain.Operation] {
+func NewActiveAlertsCache(ctx context.Context, messenger messaging.IMessenger[messaging.RabbitMqExchange, amqp091.Delivery], exchange messaging.RabbitMqExchange, fireOpsApi fireops.IFireOpsApi, logger log.ILogger, opts ...func(*ActiveAlertsCache)) INotificationService[[]domain.Operation] {
 	aac := &ActiveAlertsCache{
-		activeAlertsClient: activeAlertsClient,
-		fireOpsApi:         fireOpsApi,
-		logger:             logger,
-		fireOpsTickRate:    20 * time.Second,
+		messenger:       messenger,
+		exchange:        exchange,
+		fireOpsApi:      fireOpsApi,
+		logger:          logger,
+		fireOpsTickRate: 20 * time.Second,
+		ctx:             ctx,
 
 		clients:    map[async.Stream[[]domain.Operation]]bool{},
 		operations: map[string]domain.Operation{},

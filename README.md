@@ -11,7 +11,10 @@ All configuration is done via environmental variables because the intended form 
 | RABBITMQ_PORT | 5672 | RabbitMQ port |
 | RABBITMQ_USER | "" | RabbitMQ user |
 | RABBITMQ_PW | "" | RabbitMQ password |
-| RABBITMQ_EXCHANGE | "" | RabbitMQ Exchange, of which operations can be received |
+| RABBITMQ_ALERTS_EXCHANGE | fireops-edge-alerts | RabbitMQ Exchange, of which operations can be received |
+| RABBITMQ_ALERTS_ROUTING_KEY | active | RabbitMQ routing key for incomming notifications, that should be displayed |
+| RABBITMQ_HEALTH_EXCHANGE | fireops-edge-health | RabbitMQ exchange for health messages |
+| RABBITMQ_HEALTH_ROUTING_KEY | "" | RabbitMQ routing key for health messages |
 ||||
 | FIREOPS_BASE_URL | "" | FireOps url of FireOps instance (e.g. https://<HOSTNAME>:<PORT>) |
 | FIREOPS_TOKEN | "" | Api token (can be created in FireOps frontend by Administrator)|

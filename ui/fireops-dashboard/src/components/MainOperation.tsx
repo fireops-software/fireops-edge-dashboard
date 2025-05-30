@@ -71,7 +71,7 @@ const MainOperation = ({fireDepInfo, operation}: {fireDepInfo: FireDepInfo, oper
         <ItemDisplay name={"Ortsinfo"} value={operation.location_info} />
         <ItemDisplay name={"Info"} value={operation.event_alarmtext} />
       </div>
-      <div className="w-7/12 shadow-md border-2 border-secondary">
+      <div className="w-7/12 shadow-md border-2 border-base-300">
         { destAddr ? <iframe width="100%" height="100%" src={createGoogleMapsNavUrl(fireDepInfo.address, destAddr)}></iframe> : <></> }
       </div>
     </div>

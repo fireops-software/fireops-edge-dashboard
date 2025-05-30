@@ -1,6 +1,10 @@
 package main
 
 import (
+	"context"
+	"os"
+	"os/signal"
+	"syscall"
 	"time"
 
 	"github.com/fireops-software/fireops-edge-dashboard/api"
@@ -9,12 +13,13 @@ import (
 	"github.com/fireops-software/fireops-edge-dashboard/services"
 	"github.com/uoul/go-common/config"
 	"github.com/uoul/go-common/log"
-	"github.com/uoul/go-common/resource"
+	"github.com/uoul/go-common/messaging"
 )
 
 const (
 	VERSION          = "{VERSION}"
-	SHUTDOWN_TIMEOUT = time.Duration(20) * time.Second
+	SERVICE_NAME     = "fireops-edge-dashboard"
+	SHUTDOWN_TIMEOUT = 10
 )
 
 func main() {
@@ -27,8 +32,8 @@ func main() {
 		log.StringToLogLevel(cp.StringOrDefault("LOG_LEVEL", ""), log.INFO),
 	)
 
-	// Create ResourceManager
-	rm := resource.NewResourceManager(SHUTDOWN_TIMEOUT, logger)
+	// Create application context
+	appCtx, appCtxCancel := context.WithCancel(context.Background())
 
 	// Create fireops api
 	fireOpsApi := fireops.NewFireOpsApi(
@@ -38,17 +43,23 @@ func main() {
 	)
 
 	// Create services
-	activeAlertsClient := services.NewActiveAlertsClient(
-		cp.StringOrDefault("RABBITMQ_HOST", "localhost"),
+	rabbitMq := messaging.NewRabbitMqMessenger(
+		appCtx,
+		logger,
+		cp.StringOrDefault("RABBITMQ_HOST", ""),
 		cp.UInt16OrDefault("RABBITMQ_PORT", 5672),
 		cp.StringOrDefault("RABBITMQ_USER", ""),
 		cp.StringOrDefault("RABBITMQ_PW", ""),
-		cp.StringOrDefault("RABBITMQ_EXCHANGE", ""),
-		logger,
 	)
 
 	activeAlertsCache := services.NewActiveAlertsCache(
-		activeAlertsClient,
+		appCtx,
+		rabbitMq,
+		messaging.RabbitMqExchange{
+			Type:       "topic",
+			Exchange:   cp.StringOrDefault("RABBITMQ_ALERTS_EXCHANGE", "fireops-edge-alerts"),
+			RoutingKey: cp.StringOrDefault("RABBITMQ_ALERTS_ROUTING_KEY", "active"),
+		},
 		fireOpsApi,
 		logger,
 		services.WithFireOpsRefreshRate(
@@ -57,15 +68,28 @@ func main() {
 	)
 
 	unitsCache := services.NewUnitStateCache(
+		appCtx,
 		fireOpsApi,
 		logger,
 		services.WithUnitPollInterval(time.Duration(cp.IntOrDefault("FIREOPS_UNITS_POLL_INTERVAL", 60))*time.Second),
+	)
+
+	healthMonitor := services.NewHealthMonitor(
+		appCtx,
+		logger,
+		rabbitMq,
+		messaging.RabbitMqExchange{
+			Type:       "topic",
+			Exchange:   cp.StringOrDefault("RABBITMQ_HEALTH_EXCHANGE", "fireops-edge-health"),
+			RoutingKey: cp.StringOrDefault("RABBITMQ_HEALTH_ROUTING_KEY", ""),
+		},
 	)
 
 	// Create Api
 	api := api.NewApi(
 		activeAlertsCache,
 		unitsCache,
+		healthMonitor,
 		&domain.FireDepInfo{
 			DashboardVersion:    VERSION,
 			Name:                cp.StringOrDefault("FIREDEP_NAME", ""),
@@ -78,16 +102,18 @@ func main() {
 	)
 
 	// Run Services
-	go activeAlertsClient.Run()
-	rm.Register(activeAlertsClient)
-
 	go activeAlertsCache.Run()
-	rm.Register(activeAlertsCache)
-
 	go unitsCache.Run()
-	rm.Register(unitsCache)
+	go healthMonitor.Run()
 
 	// Run Api
 	apiPort := cp.UInt16OrDefault("API_PORT", 80)
-	api.Run(apiPort)
+	go api.Run(apiPort)
+
+	// Wait until stop
+	osSig := make(chan os.Signal, 1)
+	signal.Notify(osSig, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
+	<-osSig
+	appCtxCancel()
+	logger.Infof("Shutting down...")
 }

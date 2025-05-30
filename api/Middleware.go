@@ -26,10 +26,11 @@ func (e *ApiEnv) errorTranslation() func(*gin.Context) {
 		ctx.Next()
 		if !ctx.IsAborted() {
 			for _, err := range ctx.Errors {
-				// TODO | Add additional errors here
 				switch err.Err.(type) {
-				case *appError.ErrDataParsing:
+				case appError.ErrDataParsing:
 					ctx.Status(http.StatusBadRequest)
+				case appError.ErrFireOpsApi, appError.ErrRabbitMq, appError.ErrUnavailable:
+					ctx.Status(http.StatusServiceUnavailable)
 				default:
 					ctx.Status(http.StatusInternalServerError)
 				}
