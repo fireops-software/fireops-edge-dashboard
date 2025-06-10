@@ -1,4 +1,9 @@
-FROM node:22-alpine AS build-stage
+FROM node:24-alpine AS build-stage
+
+# get target platform
+ARG BUILDPLATFORM
+ARG TARGETOS
+ARG TARGETARCH
 
 # get target platform
 ARG TARGETOS
@@ -6,9 +11,10 @@ ARG TARGETARCH
 
 # install golang
 WORKDIR /
-RUN wget https://go.dev/dl/go1.24.2.linux-amd64.tar.gz \
-    && tar -xzf go1.24.2.linux-amd64.tar.gz \
-    && rm go1.24.2.linux-amd64.tar.gz
+RUN GO_VERSION=1.24.2 \
+    && wget https://go.dev/dl/go$GO_VERSION.linux-amd64.tar.gz \
+    && tar -xzf go$GO_VERSION.linux-amd64.tar.gz \
+    && rm go$GO_VERSION.linux-amd64.tar.gz
 ENV PATH=$PATH:/go/bin
 
 # set workdir for project
