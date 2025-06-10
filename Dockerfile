@@ -1,4 +1,4 @@
-FROM node:alpine AS build-stage
+FROM node:latest AS build-stage
 
 # get target platform
 ARG BUILDPLATFORM
