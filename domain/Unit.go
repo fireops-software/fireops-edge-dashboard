@@ -7,4 +7,5 @@ type Unit struct {
 	UnitStatusId    any     `json:"unit_status_id"`
 	UnitStatusColor *string `json:"unit_status_color"`
 	ActTetraGroup   *string `json:"act_tetragroup"`
+	StatusFlorian   *string `json:"status_florianstation"`
 }

@@ -12,12 +12,12 @@ import (
 )
 
 type ApiEnv struct {
-	activeAlertsCache services.INotificationService[[]domain.Operation]
-	unitsCache        services.INotificationService[[]domain.Unit]
-	healtMonitor      services.INotificationService[[]domain.Health]
-	fireDepInfo       *domain.FireDepInfo
-	logger            log.ILogger
-	releaseMode       bool
+	eventsCache  *services.EventsCache
+	unitsCache   *services.UnitsCache
+	healtMonitor *services.HealthMonitor
+	fireDepInfo  *domain.FireDepInfo
+	logger       log.ILogger
+	releaseMode  bool
 }
 
 type ErrorResponse struct {
@@ -40,7 +40,7 @@ func (a *ApiEnv) Run(port uint16) {
 		a.errorTranslation(),
 	)
 	apiV1.GET("/fireDepInfo", a.getFireDepInfo)
-	apiV1.GET("/operations", a.getActiveAlertsStream)
+	apiV1.GET("/events", a.getEventsStream)
 	apiV1.GET("/units", a.getUnitsStream)
 	apiV1.GET("/health", a.getHealthStream)
 
@@ -54,14 +54,14 @@ func WithApiReleaseMode() func(*ApiEnv) {
 	}
 }
 
-func NewApi(activeAlertsCache services.INotificationService[[]domain.Operation], unitsCache services.INotificationService[[]domain.Unit], healthMonitor services.INotificationService[[]domain.Health], fireDepInfo *domain.FireDepInfo, logger log.ILogger, opts ...func(*ApiEnv)) *ApiEnv {
+func NewApi(eventsCache *services.EventsCache, unitsCache *services.UnitsCache, healthMonitor *services.HealthMonitor, fireDepInfo *domain.FireDepInfo, logger log.ILogger, opts ...func(*ApiEnv)) *ApiEnv {
 	api := &ApiEnv{
-		activeAlertsCache: activeAlertsCache,
-		unitsCache:        unitsCache,
-		healtMonitor:      healthMonitor,
-		fireDepInfo:       fireDepInfo,
-		logger:            logger,
-		releaseMode:       false,
+		eventsCache:  eventsCache,
+		unitsCache:   unitsCache,
+		healtMonitor: healthMonitor,
+		fireDepInfo:  fireDepInfo,
+		logger:       logger,
+		releaseMode:  false,
 	}
 	for _, o := range opts {
 		o(api)

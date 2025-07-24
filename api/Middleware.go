@@ -29,7 +29,7 @@ func (e *ApiEnv) errorTranslation() func(*gin.Context) {
 				switch err.Err.(type) {
 				case appError.ErrDataParsing:
 					ctx.Status(http.StatusBadRequest)
-				case appError.ErrFireOpsApi, appError.ErrRabbitMq, appError.ErrUnavailable:
+				case appError.ErrRabbitMq, appError.ErrUnavailable:
 					ctx.Status(http.StatusServiceUnavailable)
 				default:
 					ctx.Status(http.StatusInternalServerError)

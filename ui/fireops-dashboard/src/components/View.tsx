@@ -1,30 +1,30 @@
 import { useState, useEffect } from "react";
-import { Operation } from "../domain/Operation";
-import OperationList from "./OperationList";
-import MainOperation from "./MainOperation";
+import { Event } from "../domain/Event";
 import { FireDepInfo } from "../domain/FireDepInfo";
 import { getSmallerTimeStamp } from "../utils/TimeUtil";
 import AppConfig from "../AppConfig";
 import { UnitState } from "../domain/UnitState";
 import Unit from "./Unit";
+import EventList from "./EventList";
+import MainEvent from "./MainEvent";
 
 const View = ({fireDepInfo}: {fireDepInfo: FireDepInfo}) => {
-  const [operations, setOperations] = useState<Operation[]>([])
+  const [events, setEvents] = useState<Event[]>([])
   const [units, setUnits] = useState<UnitState[]>([])
   
   useEffect(()=>{
-    const es: EventSource = new EventSource(`${AppConfig.backendBaseUrl}/api/v1/operations`);
+    const es: EventSource = new EventSource(`${AppConfig.backendBaseUrl}/api/v1/events`);
     es.onerror = (e) => console.error(e);
     es.onmessage = (e) => {
-      let o: Operation[] = JSON.parse(e.data);
-      o.sort((a: Operation, b: Operation) => {
+      let o: Event[] = JSON.parse(e.data);
+      o.sort((a: Event, b: Event) => {
         const tsA: Date | undefined = getSmallerTimeStamp(a.firstdispatch_time, a.create_time);
         const tsB: Date | undefined = getSmallerTimeStamp(b.firstdispatch_time, b.create_time);
         if(tsA == tsB || !tsA || !tsB)
             return 0;     
         return tsB.getTime() - tsA.getTime();
       });
-      setOperations(o);
+      setEvents(o);
     }
     return () => es.close();
   }, []);
@@ -51,11 +51,11 @@ const View = ({fireDepInfo}: {fireDepInfo: FireDepInfo}) => {
   }, [])
 
   let content;
-  if(operations.length > 0) {
+  if(events.length > 0) {
     content = 
       <div className="m-4 flex w-full">
-        <OperationList operations={operations} />
-        <MainOperation fireDepInfo={fireDepInfo} operation={operations[0]}/>
+        <EventList Events={events} />
+        <MainEvent fireDepInfo={fireDepInfo} event={events[0]}/>
       </div>
     
   } else {

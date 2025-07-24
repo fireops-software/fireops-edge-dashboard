@@ -9,7 +9,8 @@ const Unit = ({unit}: {unit: UnitState}) => {
           <span className="-rotate-90 text-nowrap">{unit.unit_status_id ? `(${unit.unit_status_id}) ` : "" }{unit.unit_status}</span>
         </div>
         <div className="w-3/4 h-3/4 bg-red-600 flex flex-col flex-wrap items-center justify-center text-center">
-          <span className="">{unit.unid_long}</span>
+          <span className="text-xl">{unit.unid_long}</span>
+          <span className="text-sm">(Status: {unit.status_florianstation})</span>
         </div>
       </div>
     )

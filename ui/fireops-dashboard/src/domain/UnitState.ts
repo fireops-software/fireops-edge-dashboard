@@ -6,5 +6,6 @@ export class UnitState {
     public unit_status_id?: any,
     public unit_status_color?: string,
     public act_tetragroup?: string,
+    public status_florianstation?: string,
   ){}
 }

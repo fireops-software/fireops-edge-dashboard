@@ -33,11 +33,11 @@ const Footer = ({fireDepInfo}: {fireDepInfo: FireDepInfo}) => {
   }
 
   return (
-    <div className="w-full max-h-16 flex p-4 bg-secondary text-secondary-content text-xl">
-      <div className="flex justify-start">
+    <div className="w-full max-h-16 p-4 bg-secondary text-secondary-content text-xl flex justify-center">
+      <div className="lg:flex hidden justify-start">
         <p>{ datetime.toLocaleDateString('de-DE') } | { datetime.toLocaleTimeString('de-DE') }</p>
       </div>
-      <div className="flex flex-grow justify-center">
+      <div className="hidden lg:flex flex-grow justify-center">
         <div className="flex flex-col items-center">
           <span className="text-sm">© FireOps</span>
           <span className="text-xs">Version { fireDepInfo.dashboardVersion }</span>
@@ -45,7 +45,7 @@ const Footer = ({fireDepInfo}: {fireDepInfo: FireDepInfo}) => {
       </div>
       <div className="flex justify-end text-xs">
         {health.map(h => 
-          <div className="flex items-center flex-nowrap">
+          <div key={h.ServiceName} className="flex items-center flex-nowrap">
             <div className="inline-grid *:[grid-area:1/1] ml-2 mr-1">
               <div className={`status animate-ping ${checkServiceReady(h) ? "status-success" : "status-error"}`}></div>
               <div className={`status ${checkServiceReady(h) ? "status-success" : "status-error"}`}></div>

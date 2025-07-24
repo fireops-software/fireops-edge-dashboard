@@ -5,10 +5,8 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
-	"time"
 
 	"github.com/fireops-software/fireops-edge-dashboard/api"
-	"github.com/fireops-software/fireops-edge-dashboard/dal/fireops"
 	"github.com/fireops-software/fireops-edge-dashboard/domain"
 	"github.com/fireops-software/fireops-edge-dashboard/services"
 	"github.com/uoul/go-common/config"
@@ -17,9 +15,8 @@ import (
 )
 
 const (
-	VERSION          = "{VERSION}"
-	SERVICE_NAME     = "fireops-edge-dashboard"
-	SHUTDOWN_TIMEOUT = 10
+	VERSION      = "{VERSION}"
+	SERVICE_NAME = "fireops-edge-dashboard"
 )
 
 func main() {
@@ -35,13 +32,6 @@ func main() {
 	// Create application context
 	appCtx, appCtxCancel := context.WithCancel(context.Background())
 
-	// Create fireops api
-	fireOpsApi := fireops.NewFireOpsApi(
-		cp.StringOrDefault("FIREOPS_BASE_URL", ""),
-		cp.StringOrDefault("FIREOPS_TOKEN", ""),
-		logger,
-	)
-
 	// Create services
 	rabbitMq := messaging.NewRabbitMqMessenger(
 		appCtx,
@@ -52,26 +42,26 @@ func main() {
 		cp.StringOrDefault("RABBITMQ_PW", ""),
 	)
 
-	activeAlertsCache := services.NewActiveAlertsCache(
+	eventsCache := services.NewEventsCache(
 		appCtx,
+		logger,
 		rabbitMq,
 		messaging.RabbitMqExchange{
 			Type:       "topic",
-			Exchange:   cp.StringOrDefault("RABBITMQ_ALERTS_EXCHANGE", "fireops-edge-alerts"),
-			RoutingKey: cp.StringOrDefault("RABBITMQ_ALERTS_ROUTING_KEY", "active"),
+			Exchange:   cp.StringOrDefault("RABBITMQ_EVENTS_EXCHANGE", "fireops-edge-events"),
+			RoutingKey: cp.StringOrDefault("RABBITMQ_EVENTS_ROUTING_KEY", "active"),
 		},
-		fireOpsApi,
-		logger,
-		services.WithFireOpsRefreshRate(
-			time.Duration(cp.IntOrDefault("FIREOPS_OPERATIONS_POLL_INTERVAL", 20))*time.Second,
-		),
 	)
 
 	unitsCache := services.NewUnitStateCache(
 		appCtx,
-		fireOpsApi,
 		logger,
-		services.WithUnitPollInterval(time.Duration(cp.IntOrDefault("FIREOPS_UNITS_POLL_INTERVAL", 60))*time.Second),
+		rabbitMq,
+		messaging.RabbitMqExchange{
+			Type:       "topic",
+			Exchange:   cp.StringOrDefault("RABBITMQ_UNITS_EXCHANGE", "fireops-edge-units"),
+			RoutingKey: cp.StringOrDefault("RABBITMQ_UNITS_ROUTING_KEY", ""),
+		},
 	)
 
 	healthMonitor := services.NewHealthMonitor(
@@ -87,7 +77,7 @@ func main() {
 
 	// Create Api
 	api := api.NewApi(
-		activeAlertsCache,
+		eventsCache,
 		unitsCache,
 		healthMonitor,
 		&domain.FireDepInfo{
@@ -100,11 +90,6 @@ func main() {
 		logger,
 		api.WithApiReleaseMode(),
 	)
-
-	// Run Services
-	go activeAlertsCache.Run()
-	go unitsCache.Run()
-	go healthMonitor.Run()
 
 	// Run Api
 	apiPort := cp.UInt16OrDefault("API_PORT", 80)

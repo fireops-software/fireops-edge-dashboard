@@ -8,9 +8,9 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func (a *ApiEnv) getActiveAlertsStream(ctx *gin.Context) {
-	updateCh := a.activeAlertsCache.Subscribe()
-	defer a.activeAlertsCache.Unsubscribe(updateCh)
+func (a *ApiEnv) getEventsStream(ctx *gin.Context) {
+	updateCh := a.eventsCache.Subscribe()
+	defer a.eventsCache.Unsubscribe(updateCh)
 	ticker := time.NewTicker(10 * time.Second)
 	ctx.Stream(func(w io.Writer) bool {
 		select {

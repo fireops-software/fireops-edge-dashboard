@@ -7,23 +7,20 @@ All configuration is done via environmental variables because the intended form 
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| RABBITMQ_HOST | localhost | RabbitMQ host (e.g. 192.168.x.x or Hostname) |
+| RABBITMQ_HOST |  | RabbitMQ host (e.g. 192.168.x.x or Hostname) |
 | RABBITMQ_PORT | 5672 | RabbitMQ port |
-| RABBITMQ_USER | "" | RabbitMQ user |
-| RABBITMQ_PW | "" | RabbitMQ password |
-| RABBITMQ_ALERTS_EXCHANGE | fireops-edge-alerts | RabbitMQ Exchange, of which operations can be received |
+| RABBITMQ_USER |  | RabbitMQ user |
+| RABBITMQ_PW |  | RabbitMQ password |
+| RABBITMQ_ALERTS_EXCHANGE | fireops-edge-events | RabbitMQ Exchange, of which Events can be received |
 | RABBITMQ_ALERTS_ROUTING_KEY | active | RabbitMQ routing key for incomming notifications, that should be displayed |
+| RABBITMQ_UNITS_EXCHANGE | fireops-edge-units | RabbitMQ exchange for incomming unit states |
+| RABBITMQ_UNITS_ROUTING_KEY |  | RabbitMQ routing key for incomming unit states | 
 | RABBITMQ_HEALTH_EXCHANGE | fireops-edge-health | RabbitMQ exchange for health messages |
-| RABBITMQ_HEALTH_ROUTING_KEY | "" | RabbitMQ routing key for health messages |
+| RABBITMQ_HEALTH_ROUTING_KEY |  | RabbitMQ routing key for health messages |
 ||||
-| FIREOPS_BASE_URL | "" | FireOps url of FireOps instance (e.g. https://<HOSTNAME>:<PORT>) |
-| FIREOPS_TOKEN | "" | Api token (can be created in FireOps frontend by Administrator)|
-| FIREOPS_OPERATIONS_POLL_INTERVAL | 20 | Polling interval for open operations on fireOps api (if no open operations on RabbitMQ --> no polling) |
-| FIREOPS_UNITS_POLL_INTERVAL | 60 | Polling interval for unit state |
-||||
-| FIREDEP_NAME | "" | Name of fire department (shown in headline) |
-| FIREDEP_ADDR | "" | Address of latitude, longitude of firedepartment (used as src for map navigation) |
-| FIREDEP_LOGO_URL | "" | Url for Logo, that is displayed in left upper corner |
+| FIREDEP_NAME |  | Name of fire department (shown in headline) |
+| FIREDEP_ADDR |  | Address of latitude, longitude of firedepartment (used as src for map navigation) |
+| FIREDEP_LOGO_URL |  | Url for Logo, that is displayed in left upper corner |
 | FIREDEP_MAX_TIME_TEXT_TO_SPEECH | 0 | Time, how long the voice output will play in a loop (0 -> disabled) |
 ||||
 | API_PORT | 80 | Port, via the dashboard will be available |
