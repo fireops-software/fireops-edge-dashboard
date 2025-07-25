@@ -54,7 +54,7 @@ const View = ({fireDepInfo}: {fireDepInfo: FireDepInfo}) => {
   if(events.length > 0) {
     content = 
       <div className="m-4 flex w-full">
-        <EventList Events={events} />
+        { events.length > 1 ? <EventList Events={events} /> : <></>}
         <MainEvent fireDepInfo={fireDepInfo} event={events[0]}/>
       </div>
     
