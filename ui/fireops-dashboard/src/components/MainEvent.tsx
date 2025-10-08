@@ -50,13 +50,14 @@ const Mainevent = ({fireDepInfo, event}: {fireDepInfo: FireDepInfo, event: Event
 
     // On timeout -> Stop voice output
     const timeout = setTimeout(()=> speechSynthesis.cancel(), fireDepInfo.maxTimeTextToSpeech * 1000)
-  
+
     // Cleanup
     return () => {
       speechSynthesis.cancel(); 
       clearTimeout(timeout)
     };
-  }, [event]);
+
+  }, [event.num_1]);
 
   return (
     <div className="lg:flex flex-grow hidden">
