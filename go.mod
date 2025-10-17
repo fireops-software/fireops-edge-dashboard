@@ -4,7 +4,7 @@ go 1.24.0
 
 require (
 	github.com/gin-gonic/gin v1.11.0
-	github.com/uoul/go-common v0.3.8
+	github.com/uoul/go-common v0.3.9
 )
 
 require (

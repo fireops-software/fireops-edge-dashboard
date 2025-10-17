@@ -68,8 +68,8 @@ github.com/twitchyliquid64/golang-asm v0.15.1 h1:SU5vSMR7hnwNxj24w34ZyCi/FmDZTkS
 github.com/twitchyliquid64/golang-asm v0.15.1/go.mod h1:a1lVb/DtPvCB8fslRZhAngC2+aY1QWCk3Cedj/Gdt08=
 github.com/ugorji/go/codec v1.3.0 h1:Qd2W2sQawAfG8XSvzwhBeoGq71zXOC/Q1E9y/wUcsUA=
 github.com/ugorji/go/codec v1.3.0/go.mod h1:pRBVtBSKl77K30Bv8R2P+cLSGaTtex6fsA2Wjqmfxj4=
-github.com/uoul/go-common v0.3.8 h1:HXredpys02faPlgcZ3pQbf+8PtxB5KYg/70cYO4d/yc=
-github.com/uoul/go-common v0.3.8/go.mod h1:jzC5QsS0Ff0y02nR8zh8Dw5kC9BvYxmd/x5Sndd8omE=
+github.com/uoul/go-common v0.3.9 h1:Q/AaS6fT5OVY2LCFOCFBo9+3tL7rTquB2SF6t5od17A=
+github.com/uoul/go-common v0.3.9/go.mod h1:jzC5QsS0Ff0y02nR8zh8Dw5kC9BvYxmd/x5Sndd8omE=
 go.uber.org/goleak v1.3.0 h1:2K3zAYmnTNqV73imy9J1T3WC+gmCePx2hEGkimedGto=
 go.uber.org/goleak v1.3.0/go.mod h1:CoHD4mav9JJNrW/WLlf7HGZPjdw8EucARQHekz1X6bE=
 go.uber.org/mock v0.6.0 h1:hyF9dfmbgIX5EfOdasqLsWD6xqpNZlXblLB/Dbnwv3Y=
