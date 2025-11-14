@@ -1,11 +1,13 @@
 import { useEffect } from "react";
-import { FireDepInfo } from "../domain/FireDepInfo";
 import { Event } from "../domain/Event";
 import { createGoogleMapsNavUrl } from "../utils/MapUtil";
 import ItemDisplay from "./ItemDisplay";
 import AppConfig from "../AppConfig";
+import useSettings from "../state/useSettings";
 
-const Mainevent = ({fireDepInfo, event}: {fireDepInfo: FireDepInfo, event: Event}) => {
+const Mainevent = ({event}: {event: Event}) => {
+
+  const { settings } = useSettings()
 
   // Prefer coordinates
   const destAddr = event.latitude && event.longitude ? `${event.latitude},${event.longitude}` : event.location
@@ -49,7 +51,7 @@ const Mainevent = ({fireDepInfo, event}: {fireDepInfo: FireDepInfo, event: Event
     };
 
     // On timeout -> Stop voice output
-    const timeout = setTimeout(()=> speechSynthesis.cancel(), fireDepInfo.maxTimeTextToSpeech * 1000)
+    const timeout = setTimeout(()=> speechSynthesis.cancel(), (settings ? settings.MaxTimeTextToSpeech : 0) * 1000)
 
     // Cleanup
     return () => {
@@ -84,7 +86,7 @@ const Mainevent = ({fireDepInfo, event}: {fireDepInfo: FireDepInfo, event: Event
       </div>
       <div className="w-7/12 flex flex-col">
         <div className="shadow-md border-2 border-base-300 flex-grow">
-          { destAddr ? <iframe width="100%" height="100%" src={createGoogleMapsNavUrl(fireDepInfo.address, destAddr)}></iframe> : <></> }
+          { destAddr ? <iframe width="100%" height="100%" src={createGoogleMapsNavUrl(settings ? settings.Address : "", destAddr)}></iframe> : <></> }
         </div>
       </div>
     </div>

@@ -80,12 +80,15 @@ func main() {
 		eventsCache,
 		unitsCache,
 		healthMonitor,
-		&domain.FireDepInfo{
+		&domain.Settings{
 			DashboardVersion:    VERSION,
 			Name:                cp.StringOrDefault("FIREDEP_NAME", ""),
 			Address:             cp.StringOrDefault("FIREDEP_ADDR", ""),
 			LogoUrl:             cp.StringOrDefault("FIREDEP_LOGO_URL", ""),
 			MaxTimeTextToSpeech: cp.UIntOrDefault("FIREDEP_MAX_TIME_TEXT_TO_SPEECH", 0),
+			ScreenBlankingDelay: cp.UIntOrDefault("SCREEN_BLANKING_DELAY", 300),
+			StartNightMode:      cp.StringOrDefault("NIGHT_MODE_START", "22:00"),
+			EndNightMode:        cp.StringOrDefault("NIGHT_MODE_END", "06:00"),
 		},
 		logger,
 		api.WithApiReleaseMode(),

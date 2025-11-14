@@ -30,8 +30,8 @@ func (a *ApiEnv) getEventsStream(ctx *gin.Context) {
 	})
 }
 
-func (a *ApiEnv) getFireDepInfo(ctx *gin.Context) {
-	ctx.JSON(http.StatusOK, a.fireDepInfo)
+func (a *ApiEnv) getSettings(ctx *gin.Context) {
+	ctx.JSON(http.StatusOK, a.settings)
 }
 
 func (a *ApiEnv) getUnitsStream(ctx *gin.Context) {

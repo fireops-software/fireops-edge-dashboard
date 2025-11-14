@@ -15,7 +15,7 @@ type ApiEnv struct {
 	eventsCache  *services.EventsCache
 	unitsCache   *services.UnitsCache
 	healtMonitor *services.HealthMonitor
-	fireDepInfo  *domain.FireDepInfo
+	settings     *domain.Settings
 	logger       log.ILogger
 	releaseMode  bool
 }
@@ -39,7 +39,7 @@ func (a *ApiEnv) Run(port uint16) {
 		a.useCors(),
 		a.errorTranslation(),
 	)
-	apiV1.GET("/fireDepInfo", a.getFireDepInfo)
+	apiV1.GET("/settings", a.getSettings)
 	apiV1.GET("/events", a.getEventsStream)
 	apiV1.GET("/units", a.getUnitsStream)
 	apiV1.GET("/health", a.getHealthStream)
@@ -54,12 +54,12 @@ func WithApiReleaseMode() func(*ApiEnv) {
 	}
 }
 
-func NewApi(eventsCache *services.EventsCache, unitsCache *services.UnitsCache, healthMonitor *services.HealthMonitor, fireDepInfo *domain.FireDepInfo, logger log.ILogger, opts ...func(*ApiEnv)) *ApiEnv {
+func NewApi(eventsCache *services.EventsCache, unitsCache *services.UnitsCache, healthMonitor *services.HealthMonitor, settings *domain.Settings, logger log.ILogger, opts ...func(*ApiEnv)) *ApiEnv {
 	api := &ApiEnv{
 		eventsCache:  eventsCache,
 		unitsCache:   unitsCache,
 		healtMonitor: healthMonitor,
-		fireDepInfo:  fireDepInfo,
+		settings:     settings,
 		logger:       logger,
 		releaseMode:  false,
 	}

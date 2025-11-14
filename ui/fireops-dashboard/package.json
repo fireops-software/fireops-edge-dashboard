@@ -14,7 +14,7 @@
     "daisyui": "^5.0.42",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "zustand": "^5.0.6"
+    "zustand": "^5.0.8"
   },
   "devDependencies": {
     "@eslint/js": "^9.13.0",

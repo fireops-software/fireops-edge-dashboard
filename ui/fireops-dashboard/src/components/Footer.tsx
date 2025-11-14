@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
-import { FireDepInfo } from "../domain/FireDepInfo";
 import AppConfig from "../AppConfig";
 import { Health } from "../domain/Health";
+import useSettings from "../state/useSettings";
 
-const Footer = ({fireDepInfo}: {fireDepInfo: FireDepInfo}) => {
+const Footer = () => {
   const [datetime, setDateTime] = useState(new Date())
   const [health, setHealth] = useState<Health[]>([])
+  const { settings } = useSettings()
 
   useEffect(() => {
     const intervalId: number = setInterval(() => setDateTime(new Date()), 1000)
@@ -40,7 +41,7 @@ const Footer = ({fireDepInfo}: {fireDepInfo: FireDepInfo}) => {
       <div className="hidden lg:flex flex-grow justify-center">
         <div className="flex flex-col items-center">
           <span className="text-sm">© FireOps</span>
-          <span className="text-xs">Version { fireDepInfo.dashboardVersion }</span>
+          <span className="text-xs">Version { settings?.DashboardVersion }</span>
         </div>
       </div>
       <div className="flex justify-end text-xs">
