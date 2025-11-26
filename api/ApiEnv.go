@@ -40,9 +40,7 @@ func (a *ApiEnv) Run(port uint16) {
 		a.errorTranslation(),
 	)
 	apiV1.GET("/settings", a.getSettings)
-	apiV1.GET("/events", a.getEventsStream)
-	apiV1.GET("/units", a.getUnitsStream)
-	apiV1.GET("/health", a.getHealthStream)
+	apiV1.GET("/live", a.getLiveData)
 
 	a.logger.Infof("Local api running on port %d", port)
 	router.Run(fmt.Sprintf(":%v", port))

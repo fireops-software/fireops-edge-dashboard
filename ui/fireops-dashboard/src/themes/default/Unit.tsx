@@ -1,4 +1,4 @@
-import { UnitState } from "../domain/UnitState";
+import { UnitState } from "../../domain/UnitState";
 
 const Unit = ({unit}: {unit: UnitState}) => {
   if (unit.unityp == "FEUERW") {

@@ -1,9 +1,9 @@
 import { useEffect } from "react";
-import { Event } from "../domain/Event";
-import { createGoogleMapsNavUrl } from "../utils/MapUtil";
+import { Event } from "../../domain/Event";
+import { createGoogleMapsNavUrl } from "../../utils/MapUtil";
 import ItemDisplay from "./ItemDisplay";
-import AppConfig from "../AppConfig";
-import useSettings from "../state/useSettings";
+import AppConfig from "../../AppConfig";
+import useSettings from "../../state/useSettings";
 
 const Mainevent = ({event}: {event: Event}) => {
 

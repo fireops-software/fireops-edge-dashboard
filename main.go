@@ -89,6 +89,7 @@ func main() {
 			ScreenBlankingDelay: cp.UIntOrDefault("SCREEN_BLANKING_DELAY", 300),
 			StartNightMode:      cp.StringOrDefault("NIGHT_MODE_START", "22:00"),
 			EndNightMode:        cp.StringOrDefault("NIGHT_MODE_END", "06:00"),
+			SelectedTheme:       cp.StringOrDefault("UI_THEME", "default"),
 		},
 		logger,
 		api.WithApiReleaseMode(),

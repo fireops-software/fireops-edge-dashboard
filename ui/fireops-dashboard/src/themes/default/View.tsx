@@ -1,8 +1,8 @@
 import Unit from "./Unit";
 import EventList from "./EventList";
 import MainEvent from "./MainEvent";
-import useEvents from "../state/useEvents";
-import useUnits from "../state/useUnits";
+import useEvents from "../../state/useEvents";
+import useUnits from "../../state/useUnits";
 
 const View = () => {
   const { events } = useEvents()

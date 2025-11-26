@@ -9,4 +9,5 @@ type Settings struct {
 	ScreenBlankingDelay uint
 	StartNightMode      string
 	EndNightMode        string
+	SelectedTheme       string
 }

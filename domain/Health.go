@@ -12,6 +12,7 @@ type HealthState string
 
 type Health struct {
 	ServiceName string
+	DisplayName string
 	Timestamp   time.Time
 	State       HealthState
 	Errors      []string

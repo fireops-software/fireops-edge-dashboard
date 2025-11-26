@@ -1,4 +1,4 @@
-import useSettings from "../state/useSettings";
+import useSettings from "../../state/useSettings";
 
 const Header = () => {
   const { settings } = useSettings()

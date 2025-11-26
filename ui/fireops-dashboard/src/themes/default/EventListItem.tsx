@@ -1,5 +1,5 @@
-import { Event } from "../domain/Event";
-import { getSmallerTimeStamp } from "../utils/TimeUtil";
+import { Event } from "../../domain/Event";
+import { getSmallerTimeStamp } from "../../utils/TimeUtil";
 
 const EventListItem = ({Event}: {Event: Event}) => {
   const creationTime = getSmallerTimeStamp(Event.firstdispatch_time, Event.create_time)

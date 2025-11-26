@@ -8,5 +8,6 @@ export class Settings {
     public ScreenBlankingDelay: number = 0,
     public StartNightMode: string = "",
     public EndNightMode: string = "",
+    public SelectedTheme: "default" | "modern-light" | "modern-dark",
   ){}
 }

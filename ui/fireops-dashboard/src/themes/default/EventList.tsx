@@ -1,4 +1,4 @@
-import { Event } from "../domain/Event";
+import { Event } from "../../domain/Event";
 import EventListItem from "./EventListItem";
 
 const EventList = ({Events}: {Events: Event[]}) => {
