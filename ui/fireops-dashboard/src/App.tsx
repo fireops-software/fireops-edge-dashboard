@@ -10,6 +10,7 @@ import useHealth from "./state/useHealth"
 import { LiveMsg } from "./domain/LiveMsg"
 import { UnitState } from "./domain/UnitState"
 import DefaultTheme from "./themes/default/DefaultTheme"
+import ModernTheme from "./themes/modern/ModernTheme"
 
 
 function App() {
@@ -111,15 +112,12 @@ function App() {
     <div className="flex flex-col w-screen h-screen">
       {blanking ?
         <div className="h-full w-full bg-black flex flex-col justify-center items-center">
-          <p className="text-6xl">{datetime.toLocaleDateString('de-DE')} | {datetime.toLocaleTimeString('de-DE')}</p>
+          <p className="text-6xl text-neutral-600">{datetime.toLocaleDateString('de-DE')} | {datetime.toLocaleTimeString('de-DE')}</p>
           <p className="mt-8">&copy; FireOPS</p>
         </div>
         :
-        settings?.SelectedTheme == "modern-light" ?
-        <div></div>
-        :
-        settings?.SelectedTheme == "modern-dark" ?
-        <div></div>
+        settings?.SelectedTheme == "modern-light" || settings?.SelectedTheme == "modern-dark" ?
+        <ModernTheme />
         :
         <DefaultTheme />
       }

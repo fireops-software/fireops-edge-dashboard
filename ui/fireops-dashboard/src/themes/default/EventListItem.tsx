@@ -11,7 +11,7 @@ const EventListItem = ({Event}: {Event: Event}) => {
       <div className="w-full">
         <p className="text-xl">{Event.num_1}</p>
         { creationTime ? <p>{creationTime.toLocaleString('de-DE')}</p> : <></> }
-        <p>{Event.category}</p>
+        <p>{Event.typ_eng}</p>
         <p>{Event.location}</p>
     </div>
     </div>

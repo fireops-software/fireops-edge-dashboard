@@ -1,11 +1,18 @@
 import { useEffect } from "react";
 import { Event } from "../../domain/Event";
 import { createGoogleMapsNavUrl } from "../../utils/MapUtil";
-import ItemDisplay from "./ItemDisplay";
 import AppConfig from "../../AppConfig";
 import useSettings from "../../state/useSettings";
+import IconLocation from "./assets/location_on.svg?react"
+import IconInfo from "./assets/info.svg?react"
+import IconPhone from "./assets/call.svg?react"
+import InfoCard from "./InfoCard";
+import IconGroup from "./assets/group.svg?react"
+import IconAccept from "./assets/accept.svg?react"
+import IconDecline from "./assets/decline.svg?react"
+import IconFireDep from "./assets/local_fire_department.svg?react"
 
-const Mainevent = ({event}: {event: Event}) => {
+const Mainevent = ({ event }: { event: Event }) => {
 
   const { settings } = useSettings()
 
@@ -15,13 +22,13 @@ const Mainevent = ({event}: {event: Event}) => {
   const getVoices = () => {
     return new Promise<SpeechSynthesisVoice[]>((resolve, reject) => {
       let errorCounter = 0;
-      const id = setInterval(()=>{
+      const id = setInterval(() => {
         const voices = speechSynthesis.getVoices()
-        if(voices.length !== 0){
+        if (voices.length !== 0) {
           resolve(voices)
           clearInterval(id)
         } else {
-          if(errorCounter >= AppConfig.getVoiceRetries) {
+          if (errorCounter >= AppConfig.getVoiceRetries) {
             clearInterval(id)
             reject("failed to get voices")
           }
@@ -44,18 +51,18 @@ const Mainevent = ({event}: {event: Event}) => {
       // Start voice output
       speechSynthesis.speak(utterance);
     }).catch(err => console.error(err))
-  
+
     // Register onend handler for looping
     utterance.onend = () => {
       speechSynthesis.speak(utterance);
     };
 
     // On timeout -> Stop voice output
-    const timeout = setTimeout(()=> speechSynthesis.cancel(), (settings ? settings.MaxTimeTextToSpeech : 0) * 1000)
+    const timeout = setTimeout(() => speechSynthesis.cancel(), (settings ? settings.MaxTimeTextToSpeech : 0) * 1000)
 
     // Cleanup
     return () => {
-      speechSynthesis.cancel(); 
+      speechSynthesis.cancel();
       clearTimeout(timeout)
     };
 
@@ -63,30 +70,116 @@ const Mainevent = ({event}: {event: Event}) => {
 
   return (
     <div className="lg:flex flex-grow hidden">
-      <div className="w-5/12 flex flex-col flex-grow text-xl mr-4">
-        <ItemDisplay name={"Einsatznummer"} value={event.num_1} />
-        <ItemDisplay name={"Kategorie"} value={event.category} />
-        <ItemDisplay name={"Art"} value={event.sub_eng ? event.sub_eng : event.typ_eng} />
-        <ItemDisplay name={"Alarmstufe"} value={event.alarm_lev} />
-        <ItemDisplay name={"Anrufer"} value={event.caller_name} />
-        <ItemDisplay name={"Telefon"} value={event.caller_number} />
-        <ItemDisplay name={"Ort"} value={event.location} />
-        <ItemDisplay name={"Ortsinfo"} value={event.location_info} />
-        <ItemDisplay name={"Info"} value={event.event_alarmtext} />
-        <div className="flex justify-center pt-2 text-xl">
-          <div className="flex items-center">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" className="h-6 fill-green-700"><path d="M720-120H280v-520l280-280 50 50q7 7 11.5 19t4.5 23v14l-44 174h258q32 0 56 24t24 56v80q0 7-2 15t-4 15L794-168q-9 20-30 34t-44 14Zm-360-80h360l120-280v-80H480l54-220-174 174v406Zm0-406v406-406Zm-80-34v80H160v360h120v80H80v-520h200Z"/></svg>
-            <span className="mx-2">{ event.user_responses?.accepted?.length } kommen</span>
+      <div className="w-5/12 flex flex-col flex-grow mr-4">
+        { /* General Event Information */}
+        <InfoCard>
+          <div className="flex justify-between items-center">
+            <h1 className="text-2xl">{event.typ_eng}</h1>
+            <div className="badge badge-xl badge-primary badge-soft text-nowrap">Alarmstufe {event.alarm_lev}</div>
           </div>
-          <div className="flex items-center">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" className="h-6 fill-red-700"><path d="M240-840h440v520L400-40l-50-50q-7-7-11.5-19t-4.5-23v-14l44-174H120q-32 0-56-24t-24-56v-80q0-7 2-15t4-15l120-282q9-20 30-34t44-14Zm360 80H240L120-480v80h360l-54 220 174-174v-406Zm0 406v-406 406Zm80 34v-80h120v-360H680v-80h200v520H680Z"/></svg>
-            <span className="mx-2">{ event.user_responses?.declined?.length } kommen nicht</span>
+          <span className="text-neutral-400">{event.create_time}</span>
+          {event.event_alarmtext ?
+            <div className="flex items-center mt-4">
+              <IconInfo className="h-6 mr-2" />
+              {event.event_alarmtext}
+            </div>
+            :
+            <></>
+          }
+        </InfoCard>
+
+        { /* Location */}
+        {event.location ?
+          <InfoCard>
+            <div className="flex items-center">
+              <IconLocation className="h-6 mr-2" />
+              {event.location}
+            </div>
+          </InfoCard>
+          :
+          <></>
+        }
+
+        { /* Caller */}
+        {event.caller_name || event.caller_number ?
+          <InfoCard>
+            <div className="flex items-center">
+              <IconPhone className="h-6 mr-2" />
+              {event.caller_name && event.caller_number ?
+                <span>{event.caller_name} | {event.caller_number}</span>
+                :
+                event.caller_name ?
+                  <span>{event.caller_name}</span>
+                  :
+                  <span>{event.caller_number}</span>
+              }
+            </div>
+          </InfoCard>
+          :
+          <></>
+        }
+
+        { /* Members */}
+        <InfoCard>
+          <div className="flex justify-between">
+            <div className="flex items-center">
+              <IconGroup className="h-6" />
+              <h2 className="ml-2">Mitglieder</h2>
+            </div>
+            {/*
+            <div className="join flex">
+              <div className="flex p-2 join-item">
+                <IconFireTruck className="h-6 mr-1" />
+                <span>1</span>
+              </div>
+              <div className="flex p-2 join-item">
+                <IconAs className="h-6 mr-1" />
+                <span>0</span>
+              </div>
+            </div>
+            */}
           </div>
-        </div>
+          {event.user_responses?.accepted && event.user_responses.accepted.length > 0 || event.user_responses?.declined && event.user_responses.declined.length > 0 ?
+            <div className="w-full flex mt-2">
+              <div className="w-1/2 flex flex-wrap">
+                {event.user_responses?.accepted?.map(n =>
+                  <div className="flex items-center mr-2" key={n}>
+                    <IconAccept className="h-5 fill-green-600 mr-1" />
+                    <span className="text-sm text-nowrap">{n}</span>
+                  </div>
+                )}
+              </div>
+              <div className="w-1/2 flex flex-wrap">
+                {event.user_responses?.declined?.map(n =>
+                  <div className="flex items-center mr-2" key={n}>
+                    <IconDecline className="h-5 fill-red-600 mr-1" />
+                    <span className="text-sm text-nowrap">{n}</span>
+                  </div>
+                )}
+              </div>
+            </div>
+            :
+            <span className="flex justify-center py-4 text-neutral-400">Keine Rückmeldungen</span>
+          }
+        </InfoCard>
+
+        {/* Destinations */}
+        <InfoCard>
+          <div className="flex items-center">
+            <IconFireDep className="h-6 mr-2" />
+            Feuerwehren
+          </div>
+          <div className="flex mt-4">
+            {event.destinations?.map(d =>
+              <div className="badge badge-soft badge-neutral mr-1">{d.name}</div>
+            )}
+          </div>
+        </InfoCard>
+
       </div>
       <div className="w-7/12 flex flex-col">
         <div className="shadow-md border-2 border-base-300 flex-grow">
-          { destAddr ? <iframe width="100%" height="100%" src={createGoogleMapsNavUrl(settings ? settings.Address : "", destAddr)}></iframe> : <></> }
+          {destAddr ? <iframe width="100%" height="100%" src={createGoogleMapsNavUrl(settings ? settings.Address : "", destAddr)}></iframe> : <></>}
         </div>
       </div>
     </div>

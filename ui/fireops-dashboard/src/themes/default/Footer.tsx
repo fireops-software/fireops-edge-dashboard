@@ -23,16 +23,16 @@ const Footer = () => {
 
   return (
     <div className="w-full max-h-16 p-4 bg-secondary text-secondary-content text-xl flex justify-center">
-      <div className="lg:flex hidden justify-start">
+      <div className="lg:w-1/3 lg:flex hidden justify-start">
         <p>{datetime.toLocaleDateString('de-DE')} | {datetime.toLocaleTimeString('de-DE')}</p>
       </div>
-      <div className="hidden lg:flex flex-grow justify-center">
+      <div className="lg:w-1/3 hidden lg:flex flex-grow justify-center">
         <div className="flex flex-col items-center">
           <span className="text-sm">© FireOps</span>
           <span className="text-xs">Version {settings?.DashboardVersion}</span>
         </div>
       </div>
-      <div className="flex justify-end text-xs">
+      <div className="lg:w-1/3 flex flex-wrap justify-end text-xs">
         {health.map(h =>
           <div key={h.ServiceName} className="flex items-center flex-nowrap">
             <div className="inline-grid *:[grid-area:1/1] ml-2 mr-1">

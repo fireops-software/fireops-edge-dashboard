@@ -33,7 +33,7 @@ const View = () => {
     
   }
   return (
-    <div className="flex flex-grow bg-[url('/bg_wheel.svg')] bg-no-repeat bg-contain bg-fixed bg-right-bottom overflow-auto">
+    <div className={`flex flex-grow bg-[url('/bg_wheel.svg')] bg-no-repeat bg-contain bg-fixed bg-right-bottom overflow-auto`}>
       {content}
     </div>
   )

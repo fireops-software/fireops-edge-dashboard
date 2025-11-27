@@ -1,4 +1,5 @@
 import useSettings from "../../state/useSettings";
+import FireOpsLogo from "./assets/fireops_logo.png"
 
 const Header = () => {
   const { settings } = useSettings()
@@ -13,7 +14,7 @@ const Header = () => {
           <h1 className="text-4xl">{settings?.Name}</h1>
         </div>
         <div className="lg:flex justify-start hidden">
-          <img className="h-12" src="fireops_logo.png" />
+          <img className="h-12" src={FireOpsLogo} />
         </div>
       </div>
     </>
