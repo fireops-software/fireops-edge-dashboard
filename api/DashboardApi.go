@@ -20,7 +20,7 @@ func (a *ApiEnv) getLiveData(ctx *gin.Context) {
 	defer a.unitsCache.Unsubscribe(unitsCh)
 	// Subscribe to health
 	healthCh := a.healtMonitor.Subscribe()
-	a.healtMonitor.Unsubscribe(healthCh)
+	defer a.healtMonitor.Unsubscribe(healthCh)
 	// Run Stream
 	ctx.Stream(func(w io.Writer) bool {
 		select {
