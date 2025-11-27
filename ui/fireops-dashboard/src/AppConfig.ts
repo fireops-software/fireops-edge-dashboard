@@ -1,5 +1,5 @@
 const AppConfig = {
-  backendBaseUrl: "http://localhost:8081",
+  backendBaseUrl: "",
   getVoiceRetries: 10,
   getVoiceRetryInterval: 100,
   getVoiceLanguage: "de-DE",
