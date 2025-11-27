@@ -25,6 +25,7 @@ All configuration is done via environmental variables because the intended form 
 | SCREEN_BLANKING_DELAY | 300 | Timeout in seconds(0 is disabled) for screen blanking (if there are open events blanking is inactive, as well if not during night time - see NIGHT_MODE_START and NIGHT_MODE_END) |
 | NIGHT_MODE_START | 22:00 | Start for night time(hh:mm) (during night - screen blanking is enabled) |
 | NIGHT_MODE_END | 06:00 | End for night time(hh:mm) (during night - screen blanking is enabled) |
+| UI_THEME | default | Used UI theme. Possible values ("default", "modern-light") |
 ||||
 | API_PORT | 80 | Port, via the dashboard will be available |
 | LOG_LEVEL | INFO | Possible TRACE, DEBUG, INFO, WARNING, ERROR, FATAL, OFF |
