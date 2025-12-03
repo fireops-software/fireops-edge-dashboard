@@ -10,7 +10,7 @@ const View = () => {
   const { units } = useUnits()
 
   return (
-    <div className="flex flex-grow bg-base-300 overflow-hidden">
+    <div className="flex flex-grow bg-base-200 overflow-hidden">
       {events.length > 0 ?
         <div className="flex w-full p-6 space-x-6 ">
           {events.length > 1 ? <EventList Events={events} /> : <></>}

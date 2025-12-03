@@ -15,7 +15,7 @@ const EventListItem = ({event}: {event: Event}) => {
   }
 
   return (
-    <div className="glass-card p-4 rounded-xl shadow-modern hover:shadow-modern-lg hover:-translate-y-1 transition-all duration-300 cursor-pointer border border-white/20">
+    <div className="p-4 shadow-xl rounded-xl border border-neutral-300 mb-2">
       <div className="flex items-start space-x-4">
         <div className={`flex items-center justify-center w-12 h-12 rounded-lg text-lg font-bold shadow-lg ${getAlarmLevelColor(event.alarm_lev)}`}>
           {event.alarm_lev}

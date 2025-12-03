@@ -8,11 +8,12 @@ import IconGroup from "./assets/group.svg?react"
 import IconFireDep from "./assets/local_fire_department.svg?react"
 import IconLocationOn from "./assets/location_on.svg?react"
 import IconCall from "./assets/call.svg?react"
+import InfoCard from "./InfoCard";
 
 
 
-const Mainevent = ({event}: {event: Event}) => {
-const { settings } = useSettings()
+const Mainevent = ({ event }: { event: Event }) => {
+  const { settings } = useSettings()
 
   // Prefer coordinates
   const destAddr = event.latitude && event.longitude ? `${event.latitude},${event.longitude}` : event.location
@@ -20,13 +21,13 @@ const { settings } = useSettings()
   const getVoices = () => {
     return new Promise<SpeechSynthesisVoice[]>((resolve, reject) => {
       let errorCounter = 0;
-      const id = setInterval(()=>{
+      const id = setInterval(() => {
         const voices = speechSynthesis.getVoices()
-        if(voices.length !== 0){
+        if (voices.length !== 0) {
           resolve(voices)
           clearInterval(id)
         } else {
-          if(errorCounter >= AppConfig.getVoiceRetries) {
+          if (errorCounter >= AppConfig.getVoiceRetries) {
             clearInterval(id)
             reject("failed to get voices")
           }
@@ -49,18 +50,18 @@ const { settings } = useSettings()
       // Start voice output
       speechSynthesis.speak(utterance);
     }).catch(err => console.error(err))
-  
+
     // Register onend handler for looping
     utterance.onend = () => {
       speechSynthesis.speak(utterance);
     };
 
     // On timeout -> Stop voice output
-    const timeout = setTimeout(()=> speechSynthesis.cancel(), (settings ? settings.MaxTimeTextToSpeech : 0) * 1000)
+    const timeout = setTimeout(() => speechSynthesis.cancel(), (settings ? settings.MaxTimeTextToSpeech : 0) * 1000)
 
     // Cleanup
     return () => {
-      speechSynthesis.cancel(); 
+      speechSynthesis.cancel();
       clearTimeout(timeout)
     };
 
@@ -68,11 +69,10 @@ const { settings } = useSettings()
 
 
   return (
-    <div className="flex-1 lg:flex hidden  gap-6 h-full">
+    <div className="flex-1 lg:flex hidden">
       <div className="w-2/5 flex flex-col space-y-3 h-full overflow-y-auto custom-scrollbar">
         {/* Header Card with Response Status */}
-        <div className="glass-card p-4 rounded-2xl shadow-modern-lg flex-shrink-0">
-          <div className="mb-3">
+        <InfoCard>
             <div className="grid grid-cols-10 gap-4">
               {/* Left Column - Event Title (70%) */}
               <div className="col-span-7 flex flex-col">
@@ -81,86 +81,80 @@ const { settings } = useSettings()
                   {event.event_alarmtext}
                 </div>
               </div>
-              
+
               {/* Right Column - Pills (30%) */}
-              <div className="col-span-3 flex flex-col items-end gap-2">
-                <div className={`px-3 py-2 rounded-full text-sm font-semibold border ${
-                  event.alarm_lev?.toString() === '0' ? 'text-white border-[#ecaf80]' :
+              <div className="col-span-3 flex flex-col items-end gap-2 text-nowrap">
+                <div className={`px-3 py-2 rounded-full text-sm font-semibold border ${event.alarm_lev?.toString() === '0' ? 'text-white border-[#ecaf80]' :
                   event.alarm_lev?.toString() === '1' ? 'text-white border-[#e98e6c]' :
-                  event.alarm_lev?.toString() === '2' ? 'text-white border-[#df5f5b]' :
-                  event.alarm_lev?.toString() === '3' ? 'text-white border-[#9b366f]' :
-                  'bg-neutral/10 text-neutral border-neutral/20'
-                }`} style={{
-                  backgroundColor: event.alarm_lev?.toString() === '0' ? '#ecaf80' :
-                                 event.alarm_lev?.toString() === '1' ? '#e98e6c' :
-                                 event.alarm_lev?.toString() === '2' ? '#df5f5b' :
-                                 event.alarm_lev?.toString() === '3' ? '#9b366f' :
-                                 undefined
-                }}>
+                    event.alarm_lev?.toString() === '2' ? 'text-white border-[#df5f5b]' :
+                      event.alarm_lev?.toString() === '3' ? 'text-white border-[#9b366f]' :
+                        'bg-neutral/10 text-neutral border-neutral/20'
+                  }`} style={{
+                    backgroundColor: event.alarm_lev?.toString() === '0' ? '#ecaf80' :
+                      event.alarm_lev?.toString() === '1' ? '#e98e6c' :
+                        event.alarm_lev?.toString() === '2' ? '#df5f5b' :
+                          event.alarm_lev?.toString() === '3' ? '#9b366f' :
+                            undefined
+                  }}>
                   Alarmstufe {event.alarm_lev}
                 </div>
                 {event.destinations && event.destinations.length > 0 && (
-                  <div className="flex items-center bg-gray-100 text-gray-700 px-3 py-2 rounded-full text-sm font-semibold border border-gray-200">
+                  <div className="flex flex-nowrap items-center bg-gray-100 text-gray-700 px-3 py-2 rounded-full text-sm font-semibold border border-gray-200">
                     <IconFireDep className="h-6 fill-neutral" />
                     {event.destinations.length} FF
                   </div>
                 )}
-                <div className="flex items-center bg-green-100 text-green-800 px-3 py-2 rounded-full text-sm font-semibold border border-green-200">
+                <div className="flex flex-nowrap items-center bg-green-100 text-green-800 px-3 py-2 rounded-full text-sm font-semibold border border-green-200">
                   <IconGroup className="mr-1 h-6 fill-success-content" />
                   {event.user_responses?.accepted?.length || 0} kommen
                 </div>
               </div>
             </div>
-          </div>
-          
+        </InfoCard>
 
-          <div className="grid grid-cols-1 gap-3">
-            
-          </div>
-        </div>
 
         {/* Location Info Card - moved above contact */}
-        <div className="glass-card p-4 rounded-2xl shadow-modern-lg flex-shrink-0">
+        <InfoCard>
           <h3 className="text-lg font-semibold text-neutral mb-2 flex items-center">
             <IconLocationOn className="mr-2 fill-neutral h-6" />
             Einsatzort
           </h3>
           <div className="grid grid-cols-1 gap-2">
-            <div className="group hover:bg-base-100/50 p-2 rounded-lg transition-all duration-200">
+            <div className="p-2">
               <dd className="text-2xl font-bold text-neutral leading-tight break-words">
                 {event.location}
               </dd>
             </div>
             <ItemDisplay name={"Ortsinfo"} value={event.location_info} />
           </div>
-        </div>
+        </InfoCard>
 
         {/* Contact Info Card */}
-        <div className="glass-card p-4 rounded-2xl shadow-modern-lg flex-shrink-0">
+        <InfoCard>
           <h3 className="text-lg font-semibold text-neutral mb-2 flex items-center">
             <IconCall className="mr-2 fill-neutral h-6" />
             Kontaktinformationen
           </h3>
           <div className="grid grid-cols-1 gap-2">
             {event.caller_name && (
-              <div className="group hover:bg-base-100/50 p-2 rounded-lg transition-all duration-200">
+              <div className="p-2">
                 <div className="text-lg font-bold text-neutral leading-tight break-words">
                   {event.caller_name}
                 </div>
               </div>
             )}
             {event.caller_number && (
-              <div className="group hover:bg-base-100/50 p-2 rounded-lg transition-all duration-200">
+              <div className="p-2">
                 <div className="text-lg font-bold text-neutral leading-tight break-words">
                   {event.caller_number}
                 </div>
               </div>
             )}
           </div>
-        </div>
+        </InfoCard>
 
         {/* Mannschaft Card */}
-        <div className="glass-card p-4 rounded-2xl shadow-modern-lg flex-shrink-0">
+        <InfoCard>
           <h3 className="text-lg font-semibold text-neutral mb-3 flex items-center">
             <IconGroup className="h-6 mr-2 fill-neutral" />
             Mannschaft
@@ -168,7 +162,7 @@ const { settings } = useSettings()
           <div className="grid grid-cols-3 gap-2">
             {event.user_responses?.accepted && event.user_responses.accepted.length > 0 ? (
               event.user_responses.accepted.map((name, index) => (
-                <div key={index} className="flex items-center p-2 bg-base-100/50 rounded-lg border border-base-200/50">
+                <div key={index} className="flex items-center p-2">
                   <div className="w-2 h-2 bg-green-500 rounded-full mr-2 flex-shrink-0"></div>
                   <span className="text-neutral font-medium text-sm truncate" title={name}>{name}</span>
                 </div>
@@ -180,34 +174,32 @@ const { settings } = useSettings()
               </div>
             )}
           </div>
-        </div>
+        </InfoCard>
 
         {/* Feuerwehren Card */}
-        {event.destinations && event.destinations.length > 0 && (
-          <div className="glass-card p-4 rounded-2xl shadow-modern-lg flex-shrink-0">
-            <h3 className="text-lg font-semibold text-neutral mb-3 flex items-center">
-              <IconFireDep className="mr-2 fill-neutral h-6" />
-              Feuerwehren
-            </h3>
-            <div className="grid grid-cols-3 gap-2">
-              {event.destinations.map((destination, index) => (
-                <div key={index} className="flex items-center p-2 bg-base-100/50 rounded-lg border border-base-200/50">
-                  <div className="w-2 h-2 bg-gray-600 rounded-full mr-2 flex-shrink-0"></div>
-                  <span className="text-neutral font-medium text-sm truncate" title={destination.name}>{destination.name}</span>
-                </div>
-              ))}
-            </div>
+        <InfoCard>
+          <h3 className="text-lg font-semibold text-neutral mb-3 flex items-center">
+            <IconFireDep className="mr-2 fill-neutral h-6" />
+            Feuerwehren
+          </h3>
+          <div className="grid grid-cols-3 gap-2">
+            {event.destinations?.map((destination, index) => (
+              <div key={index} className="flex items-center p-2 rounded-lg border border-base-200/50">
+                <div className="w-2 h-2 bg-gray-600 rounded-full mr-2 flex-shrink-0"></div>
+                <span className="text-neutral font-medium text-sm truncate" title={destination.name}>{destination.name}</span>
+              </div>
+            ))}
           </div>
-        )}
+        </InfoCard>
       </div>
-      
+
       {/* Map Section - clean without card */}
       <div className="w-3/5 flex flex-col h-full">
         <div className="rounded-xl overflow-hidden shadow-modern-lg flex-1 h-full">
-          { destAddr ? (
-            <iframe 
-              width="100%" 
-              height="100%" 
+          {destAddr ? (
+            <iframe
+              width="100%"
+              height="100%"
               src={createGoogleMapsNavUrl(settings ? settings.Address : "", destAddr)}
               className="border-0 rounded-xl"
               title="Einsatzort Navigation"
