@@ -68,7 +68,7 @@ const { settings } = useSettings()
 
 
   return (
-    <div className="flex-1 lg:flex hidden animate-fade-in gap-6 h-full">
+    <div className="flex-1 lg:flex hidden  gap-6 h-full">
       <div className="w-2/5 flex flex-col space-y-3 h-full overflow-y-auto custom-scrollbar">
         {/* Header Card with Response Status */}
         <div className="glass-card p-4 rounded-2xl shadow-modern-lg flex-shrink-0">

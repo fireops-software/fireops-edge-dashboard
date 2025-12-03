@@ -1,9 +1,9 @@
 const ItemDisplay = ({name, value}: {name: any, value: any}) => {
   if(name && value){
     return (
-      <div className="group hover:bg-base-100/50 p-2 rounded-lg transition-all duration-200">
+      <div className="p-2 rounded-lg">
         <div className="flex items-start justify-between">
-          <dt className="text-sm font-medium text-neutral/70 mb-1 group-hover:text-neutral transition-colors">
+          <dt className="text-sm font-medium text-neutral/70 mb-1">
             {name}:
           </dt>
         </div>
