@@ -3,11 +3,13 @@ import AppConfig from "../../AppConfig";
 import { Health } from "../../domain/Health";
 import useHealth from "../../state/useHealth";
 import IconSchedule from "./assets/schedule.svg?react"
+import useSettings from "../../state/useSettings";
 
 
 const Footer = () => {
   const [datetime, setDateTime] = useState(new Date())
   const { health } = useHealth()
+  const { settings } = useSettings()
 
   useEffect(() => {
     const intervalId: number = setInterval(() => setDateTime(new Date()), 1000)
@@ -25,6 +27,12 @@ const Footer = () => {
       <div className="flex items-center justify-end ml-30">
         <IconSchedule className="h-6 fill-neutral-400" />
         <span className="ml-3">{datetime.toLocaleDateString('de-DE')} | {datetime.toLocaleTimeString('de-DE')}</span>
+      </div>
+      <div className="flex flex-grow justify-center">
+        <div className="flex flex-col items-center">
+          <span>© FireOps</span>
+          <span className="text-xs">Version {settings?.DashboardVersion}</span>
+        </div>
       </div>
       <div className="flex flex-wrap justify-start mr-30">
         <span className="mr-4">System Status:</span>
