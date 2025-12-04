@@ -12,6 +12,14 @@ import (
 )
 
 func (a *ApiEnv) getLiveData(ctx *gin.Context) {
+	// Get version info from query parameter
+	clientVersion := ctx.Query("version")
+	a.logger.Debugf("Client with version %s connected", clientVersion)
+	defer a.logger.Debug("Client disconnected")
+	pageRefreshCommand := make(chan bool, 1)
+	if clientVersion != a.settings.DashboardVersion {
+		pageRefreshCommand <- true
+	}
 	// Subscribe to events
 	eventCh := a.eventsCache.Subscribe()
 	defer a.eventsCache.Unsubscribe(eventCh)
@@ -21,12 +29,23 @@ func (a *ApiEnv) getLiveData(ctx *gin.Context) {
 	// Subscribe to health
 	healthCh := a.healtMonitor.Subscribe()
 	defer a.healtMonitor.Unsubscribe(healthCh)
+	// Create Ticker
+	ticker := time.NewTicker(10 * time.Second)
+	defer ticker.Stop()
 	// Run Stream
 	ctx.Stream(func(w io.Writer) bool {
 		select {
 		case <-ctx.Done():
 			return false
-		case <-time.Tick(10 * time.Second):
+		case <-pageRefreshCommand:
+			ctx.SSEvent("message", dto.LiveMsg[any]{
+				MsgId:     uuid.NewString(),
+				MsgType:   dto.RELOAD,
+				Timestamp: time.Now(),
+				Body:      nil,
+			})
+			return true
+		case <-ticker.C:
 			ctx.SSEvent("heartbeat", nil)
 			return true
 		case msg := <-eventCh:

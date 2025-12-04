@@ -8,6 +8,7 @@ const (
 	EVENTS = LiveMsgType("EVENTS")
 	UNITS  = LiveMsgType("UNITS")
 	HEALTH = LiveMsgType("HEALTH")
+	RELOAD = LiveMsgType("RELOAD")
 )
 
 type LiveMsg[T any] struct {

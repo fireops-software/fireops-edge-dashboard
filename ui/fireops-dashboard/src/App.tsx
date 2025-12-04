@@ -47,37 +47,43 @@ function App() {
 
   // Get LiveData
   useEffect(() => {
-    const es: EventSource = new EventSource(`${AppConfig.backendBaseUrl}/api/v1/live`);
-    es.onerror = (e) => console.error(e);
-    es.onmessage = (e) => {
-      let msg: LiveMsg<any> = JSON.parse(e.data)
-      switch (msg.MsgType) {
-        case "EVENTS":
-          msg.Body.sort((a: Event, b: Event) => {
-            const tsA: Date | undefined = getSmallerTimeStamp(a.firstdispatch_time, a.create_time);
-            const tsB: Date | undefined = getSmallerTimeStamp(b.firstdispatch_time, b.create_time);
-            if (tsA == tsB || !tsA || !tsB)
-              return 0;
-            return tsB.getTime() - tsA.getTime();
-          });
-          setEvents(msg.Body)
-          break
-        case "UNITS":
-          msg.Body.sort((a: UnitState, b: UnitState) => {
-            if (a == b || !a.unid_long || !b.unid_long)
-              return 0
-            else
-              return a.unid_long < b.unid_long ? -1 : 1
-          })
-          setUnits(msg.Body)
-          break
-        case "HEALTH":
-          setHealth(msg.Body)
-          break
+    if (settings) {
+      const es: EventSource = new EventSource(`${AppConfig.backendBaseUrl}/api/v1/live?version=${settings.DashboardVersion}`);
+      es.onerror = (e) => console.error(e);
+      es.onmessage = (e) => {
+        let msg: LiveMsg<any> = JSON.parse(e.data)
+        switch (msg.MsgType) {
+          case "RELOAD":
+            // Reload page
+            location.reload()
+            break
+          case "EVENTS":
+            msg.Body.sort((a: Event, b: Event) => {
+              const tsA: Date | undefined = getSmallerTimeStamp(a.firstdispatch_time, a.create_time);
+              const tsB: Date | undefined = getSmallerTimeStamp(b.firstdispatch_time, b.create_time);
+              if (tsA == tsB || !tsA || !tsB)
+                return 0;
+              return tsB.getTime() - tsA.getTime();
+            });
+            setEvents(msg.Body)
+            break
+          case "UNITS":
+            msg.Body.sort((a: UnitState, b: UnitState) => {
+              if (a == b || !a.unid_long || !b.unid_long)
+                return 0
+              else
+                return a.unid_long < b.unid_long ? -1 : 1
+            })
+            setUnits(msg.Body)
+            break
+          case "HEALTH":
+            setHealth(msg.Body)
+            break
+        }
       }
+      return () => es.close();
     }
-    return () => es.close();
-  }, []);
+  }, [settings]);
 
 
   // Screen blanking
@@ -117,9 +123,9 @@ function App() {
         </div>
         :
         settings?.SelectedTheme == "modern-light" || settings?.SelectedTheme == "modern-dark" ?
-        <ModernTheme />
-        :
-        <DefaultTheme />
+          <ModernTheme />
+          :
+          <DefaultTheme />
       }
     </div>
   )
