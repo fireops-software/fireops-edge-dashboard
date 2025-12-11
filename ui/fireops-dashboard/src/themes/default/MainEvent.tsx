@@ -74,12 +74,12 @@ const Mainevent = ({ event }: { event: Event }) => {
         { /* General Event Information */}
         <InfoCard>
           <div className="flex justify-between items-center">
-            <h1 className="text-2xl">{event.typ_eng}</h1>
+            <h1 className="text-3xl">{event.typ_eng}</h1>
             <div className="badge badge-xl badge-primary badge-soft text-nowrap">Alarmstufe {event.alarm_lev}</div>
           </div>
-          <span className="text-neutral-400">{event.create_time}</span>
+          <span className="text-neutral-400 text-lg">{event.create_time}</span>
           {event.event_alarmtext ?
-            <div className="flex items-center mt-4">
+            <div className="flex items-center mt-4 text-xl text-wrap">
               <IconInfo className="h-6 mr-2" />
               {event.event_alarmtext}
             </div>
@@ -91,7 +91,7 @@ const Mainevent = ({ event }: { event: Event }) => {
         { /* Location */}
         {event.location ?
           <InfoCard>
-            <div className="flex items-center">
+            <div className="flex items-center text-xl">
               <IconLocation className="h-6 mr-2" />
               {event.location}
             </div>
@@ -103,7 +103,7 @@ const Mainevent = ({ event }: { event: Event }) => {
         { /* Caller */}
         {event.caller_name || event.caller_number ?
           <InfoCard>
-            <div className="flex items-center">
+            <div className="flex items-center text-xl">
               <IconPhone className="h-6 mr-2" />
               {event.caller_name && event.caller_number ?
                 <span>{event.caller_name} | {event.caller_number}</span>
@@ -124,7 +124,7 @@ const Mainevent = ({ event }: { event: Event }) => {
           <div className="flex justify-between">
             <div className="flex items-center">
               <IconGroup className="h-6" />
-              <h2 className="ml-2">Mitglieder</h2>
+              <h2 className="ml-2 text-xl">Mitglieder</h2>
             </div>
             {/*
             <div className="join flex">
@@ -159,13 +159,13 @@ const Mainevent = ({ event }: { event: Event }) => {
               </div>
             </div>
             :
-            <span className="flex justify-center py-4 text-neutral-400">Keine Rückmeldungen</span>
+            <span className="flex justify-center py-4 text-neutral-400 text-lg">Keine Rückmeldungen</span>
           }
         </InfoCard>
 
         {/* Destinations */}
         <InfoCard>
-          <div className="flex items-center">
+          <div className="flex items-center text-xl">
             <IconFireDep className="h-6 mr-2" />
             Feuerwehren
           </div>
