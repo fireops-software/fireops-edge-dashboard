@@ -5,6 +5,7 @@ export class Settings {
     public Address: string = "",
     public LogoUrl: string = "",
     public MaxTimeTextToSpeech: number = 0,
+    public CountTextToSpeechWhenDispached: number = 0,
     public ScreenBlankingDelay: number = 0,
     public StartNightMode: string = "",
     public EndNightMode: string = "",

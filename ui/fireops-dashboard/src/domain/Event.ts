@@ -24,5 +24,7 @@ export class Event {
       accepted?: string[],
       declined?: string[],
     },
+    public fullChain?: boolean,         // Complete alert chain
+    public alert_state?: string,        // "Alarmiert" oder "Ausgerückt"
   ){}
 }
