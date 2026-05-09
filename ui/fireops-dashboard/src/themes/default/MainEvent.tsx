@@ -39,6 +39,9 @@ const Mainevent = ({ event }: { event: Event }) => {
   }
 
   useEffect(() => {
+    // Check if voice needed
+    if(event.category?.toUpperCase() == "SELBST") return
+
     // Create text to read
     const alertText = `${event.sub_eng ?? event.category ?? ""} - ${event.event_alarmtext ?? ""} - Alarmstufe ${event.alarm_lev} - ${event.location ?? ""}`;
     const utterance = new SpeechSynthesisUtterance(alertText);
@@ -71,8 +74,8 @@ const Mainevent = ({ event }: { event: Event }) => {
   }, [event.num_1, event.alert_state]);
 
   return (
-    <div className="lg:flex flex-grow hidden">
-      <div className="w-5/12 flex flex-col flex-grow pr-8 pl-4 pt-2">
+    <div className="lg:flex grow hidden">
+      <div className="w-5/12 flex flex-col grow pr-8 pl-4 pt-2">
         { /* General Event Information */}
         <InfoCard className="indicator w-full">
           <div className="indicator-item indicator-start ">
@@ -207,7 +210,7 @@ const Mainevent = ({ event }: { event: Event }) => {
 
       </div>
       <div className="w-7/12 flex flex-col">
-        <div className="shadow-md border-2 border-base-300 flex-grow">
+        <div className="shadow-md border-2 border-base-300 grow">
           {destAddr ? <iframe width="100%" height="100%" src={createGoogleMapsNavUrl(settings ? settings.Address : "", destAddr)}></iframe> : <></>}
         </div>
       </div>
