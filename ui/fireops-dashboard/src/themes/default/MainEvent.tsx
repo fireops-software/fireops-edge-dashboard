@@ -11,6 +11,7 @@ import IconGroup from "./assets/group.svg?react"
 import IconAccept from "./assets/accept.svg?react"
 import IconDecline from "./assets/decline.svg?react"
 import IconFireDep from "./assets/local_fire_department.svg?react"
+import IconFireTruck from "./assets/fire_truck.svg?react"
 
 const Mainevent = ({ event }: { event: Event }) => {
 
@@ -109,9 +110,10 @@ const Mainevent = ({ event }: { event: Event }) => {
             </div>
             }
           </div>
-          <span className="text-neutral-400 text-lg">{event.create_time}</span>
+          <span className="text-neutral-400 text-lg mb-4">{event.create_time}</span>
+
           {event.event_alarmtext ?
-            <div className="flex items-center mt-4 text-xl text-wrap">
+            <div className="flex items-center text-xl text-wrap">
               <IconInfo className="h-6 mr-2" />
               {event.event_alarmtext}
             </div>
@@ -151,6 +153,20 @@ const Mainevent = ({ event }: { event: Event }) => {
           <></>
         }
 
+        { /* Required Units */}
+        {event.alerted_units && event.alerted_units.length > 0 ? 
+          <InfoCard>
+            <div className="flex flex-wrap gap-2">
+              <IconFireTruck className="h-6" />
+              {event.alerted_units.sort((a, b) => !a.priority ? 1 : !b.priority ? -1 : a.priority - b.priority).map((u, i) =>
+                <div className="badge badge-soft badge-outline badge-lg badge-primary text-nowrap" key={u.unid_long}>{i + 1}. {u.unityp}</div>
+              )}
+            </div>
+          </InfoCard>
+          :
+          <></>
+        }
+
         { /* Members */}
         <InfoCard>
           <div className="flex justify-between">
@@ -158,18 +174,6 @@ const Mainevent = ({ event }: { event: Event }) => {
               <IconGroup className="h-6" />
               <h2 className="ml-2 text-xl">Mitglieder</h2>
             </div>
-            {/*
-            <div className="join flex">
-              <div className="flex p-2 join-item">
-                <IconFireTruck className="h-6 mr-1" />
-                <span>1</span>
-              </div>
-              <div className="flex p-2 join-item">
-                <IconAs className="h-6 mr-1" />
-                <span>0</span>
-              </div>
-            </div>
-            */}
           </div>
           {event.user_responses?.accepted && event.user_responses.accepted.length > 0 || event.user_responses?.declined && event.user_responses.declined.length > 0 ?
             <div className="w-full flex mt-2">
@@ -197,13 +201,10 @@ const Mainevent = ({ event }: { event: Event }) => {
 
         {/* Destinations */}
         <InfoCard>
-          <div className="flex items-center text-xl">
-            <IconFireDep className="h-6 mr-2" />
-            Feuerwehren
-          </div>
-          <div className="flex mt-4 flex-wrap space-x-1.5 space-y-1.5">
+          <div className="flex flex-wrap gap-1.5">
+            <IconFireDep className="h-6" />
             {event.destinations?.map(d =>
-              <div className="badge badge-soft badge-neutral text-nowrap" key={d.id}>{d.name}</div>
+              <div className="badge badge-soft badge-neutral text-nowrap" key={d.name}>{d.name}</div>
             )}
           </div>
         </InfoCard>

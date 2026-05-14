@@ -20,6 +20,12 @@ export class Event {
       id?: number
       name?: string
     }],
+    public alerted_units?: [{
+      unid_long?: string
+      s_name?: string
+      unityp?: string
+      priority?: number
+    }],
     public user_responses?: {           // Komme/Komme-Nicht
       accepted?: string[],
       declined?: string[],
