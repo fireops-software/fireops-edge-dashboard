@@ -122,7 +122,17 @@ const Mainevent = ({ event }: { event: Event }) => {
           <InfoCard>
             <div className="flex items-center text-xl">
               <IconLocation className="h-6 mr-2" />
-              {event.location}
+              <div className="flex flex-col">
+                {event.location && (
+                  <span>{event.location}</span>
+                )}
+                {event.location_info && (
+                  <span>{event.location_info}</span>
+                )}
+                {event.location_involved && (
+                  <span>Betroffen: {event.location_involved}</span>
+                )}
+              </div>
             </div>
           </InfoCard>
           :
