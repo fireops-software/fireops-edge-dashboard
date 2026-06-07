@@ -122,10 +122,19 @@ const Mainevent = ({ event }: { event: Event }) => {
           <div className="grid grid-cols-1 gap-2">
             <div className="p-2">
               <dd className="text-2xl font-bold text-neutral leading-tight break-words">
-                {event.location}
+                <div className="flex flex-col">
+                  {event.location && (
+                    <span>{event.location}</span>
+                  )}
+                  {event.location_info && (
+                    <span>{event.location_info}</span>
+                  )}
+                  {event.location_involved && (
+                    <span>Betroffen: {event.location_involved}</span>
+                  )}
+                </div>
               </dd>
             </div>
-            <ItemDisplay name={"Ortsinfo"} value={event.location_info} />
           </div>
         </InfoCard>
 
